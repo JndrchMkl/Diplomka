@@ -5,18 +5,21 @@ import javafx.concurrent.Task;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SplittableRandom;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import static entitytask.SystemCore.CHILD_EXPENSE;
 import static entitytask.SystemCore.SALARY_MULTIPLIER;
 
-public class Entity implements Comparable<Entity> {
+public class Entity implements Comparable<Entity>, Callable<Entity> {
 
     //================================================================================
     // Properties
     //================================================================================
     private Population population;
-    private Task<Entity> entityTask = null;
+    private Future<Entity> entityFuture = null;
     private String name;
     private Double talent;
     private Double sources = 0.0;
@@ -27,6 +30,7 @@ public class Entity implements Comparable<Entity> {
     //================================================================================
     // Constructors
     //================================================================================
+    //region Constructors
 
     /**
      * Copy constructor. This constructor makes hard copy of the object.
@@ -36,7 +40,7 @@ public class Entity implements Comparable<Entity> {
     public Entity(Entity entity) {
         // TODO full hard copy
         this.population = entity.getPopulation();
-        this.entityTask = entity.getEntityTask(); //dont need hard copy
+        this.entityFuture = entity.getEntityFuture(); //dont need hard copy
         this.name = entity.getName(); //ok
         this.talent = entity.getTalent(); //ok
         this.sources = entity.getSources();//ok
@@ -61,28 +65,29 @@ public class Entity implements Comparable<Entity> {
         this.children = new LinkedList<>();
     }
 
+    //endregion
+
+
     //================================================================================
     // General operation
     //================================================================================
-
-    public Task<Entity> createTask() {
-        this.entityTask = new Task<>() {
-            @Override
-            protected Entity call() throws Exception {
-                // add salary
-                gainSources();
-                // reproduce, if enough sources
-                reproduce();
-                return Entity.this;
-            }
-        };
-        return entityTask;
+    @Override
+    public Entity call() throws Exception {
+        // add salary
+        gainSources();
+        // reproduce, if enough sources
+        reproduce();
+        return Entity.this;
     }
 
-    private Entity obtainFittest() throws ExecutionException, InterruptedException {
-        Entity fittest = this.population.findFittest();
-        if (fittest != this && fittest != null) { //v pripade, ze entita nezazadala sama o sebe
-            fittest = fittest.entityTask.get(); //cekame nez dopocita
+    private Entity obtainFittest() throws ExecutionException, InterruptedException, BrokenBarrierException {
+        System.out.println("Blocking " + this);
+        Entity fittest = this.population.findFittest(Entity.this);
+        System.out.println("Unblocking after find " + this);
+        if (fittest != null) { //v pripade, ze entita nezazadala sama o sebe
+            System.out.println("Blocking before call " + this);
+            fittest = fittest.entityFuture.get(); //cekame nez dopocita
+            System.out.println("Unblocking after call " + this);
             return fittest;
         }
         return null;
@@ -110,25 +115,20 @@ public class Entity implements Comparable<Entity> {
 
 
     private void gainSources() {
-        this.sources = sources+(this.talent * SALARY_MULTIPLIER);
+        this.sources = sources + (this.talent * SALARY_MULTIPLIER);
         System.out.println(this.toString() + " Have " + this.sources + " sources.");
     }
 
     private void reproduce() throws Exception {
         // Selection of fittest partner for this Entity
         Entity fittest = this.selection();
-        if (fittest == null|| this.getSources()<CHILD_EXPENSE) {
+        System.out.println(this.toString() + " found fittest: " + fittest);
+        if (fittest == null || this.getSources() < CHILD_EXPENSE) {
             return;
         }
-        System.out.println(this.toString() + " found fittest: " + fittest);
         // Crossover
-        Entity child = new Entity(
-                this.population,
-                "E" + this.population.size(),
-                this.crossover(fittest),
-                this,
-                fittest
-        );
+        Entity child = crossover(fittest);
+
         //mutation
         this.mutation(child);
 
@@ -137,8 +137,8 @@ public class Entity implements Comparable<Entity> {
         fittest.children.add(child);
 
         // and have expenses...
-        this.setSources(sources-CHILD_EXPENSE);
-        fittest.setSources(fittest.getSources()-CHILD_EXPENSE);
+        this.setSources(sources - CHILD_EXPENSE);
+        fittest.setSources(fittest.getSources() - CHILD_EXPENSE);
         // Population have new member
         this.population.addEntity(child);
         System.out.println(this.toString() + " are reproducing with " + fittest + " and they have " + child);
@@ -151,16 +151,21 @@ public class Entity implements Comparable<Entity> {
     }
 
     //Crossover
-    public double crossover(Entity fittest) {
+    public synchronized Entity crossover(Entity fittest) {
         if (fittest == null)
-            return 0;
+            return null;
 
         //Select crossover value
         Double crossOverValueOne = this.getTalent();
         Double crossOverValueTwo = fittest.getTalent();
-
-        //Swap values among parents
-        return (crossOverValueOne + crossOverValueTwo) / 2;
+        Entity child = new Entity(
+                this.population,
+                "E" + this.population.size(),
+                (crossOverValueOne + crossOverValueTwo) / 2,
+                this,
+                fittest
+        );
+        return child;
     }
 
     //Mutation
@@ -193,12 +198,12 @@ public class Entity implements Comparable<Entity> {
         this.population = population;
     }
 
-    public Task<Entity> getEntityTask() {
-        return entityTask;
+    public Future<Entity> getEntityFuture() {
+        return entityFuture;
     }
 
-    public void setEntityTask(Task<Entity> entityTask) {
-        this.entityTask = entityTask;
+    public void setEntityFuture(Future<Entity> entityFuture) {
+        this.entityFuture = entityFuture;
     }
 
     public String getName() {
@@ -248,6 +253,8 @@ public class Entity implements Comparable<Entity> {
     public void setChildren(List<Entity> children) {
         this.children = children;
     }
+
+
     //endregion
 
 }

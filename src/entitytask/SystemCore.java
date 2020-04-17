@@ -5,7 +5,7 @@ public class SystemCore {
     public static final double SALARY_MULTIPLIER = 100.0;
     private static SystemCore single_instance = null; //Singleton
     private static final int POPULATION_SIZE = 2;
-    private static final int END_TICK = 10;
+    private static final int END_TICK = 50;
     private int actualTick = 0;
 
 
