@@ -5,7 +5,7 @@ public class SystemCore {
     public static final double SALARY_MULTIPLIER = 100.0;
     private static SystemCore single_instance = null; //Singleton
     private static final int POPULATION_SIZE = 2;
-    private static final int LAST_TICK = 5;
+    private static final int END_TICK = 10;
     private int actualTick = 0;
 
 
@@ -19,7 +19,7 @@ public class SystemCore {
         Population population = new Population();
         population.addAllEntities(EntityGenerator.generate(population, POPULATION_SIZE));
         System.out.println("Entry set of entities has been generated...");
-        while (LAST_TICK != actualTick) {
+        while (END_TICK != actualTick) {
             population.nextTick();
             System.out.println("Time tick " + actualTick + " has been done...");
             System.out.println("---------------------------------------------------------------------------------------");
