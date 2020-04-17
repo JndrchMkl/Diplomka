@@ -7,27 +7,26 @@ import java.util.List;
 import java.util.SplittableRandom;
 import java.util.concurrent.ExecutionException;
 
+import static entitytask.SystemCore.CHILD_EXPENSE;
+import static entitytask.SystemCore.SALARY_MULTIPLIER;
+
 public class Entity implements Comparable<Entity> {
 
     //================================================================================
     // Properties
     //================================================================================
-    private Populace populace;
+    private Population population;
     private Task<Entity> entityTask = null;
     private String name;
     private Double talent;
     private Double sources = 0.0;
     private Entity parentA;
     private Entity parentB;
-    private List<Entity> children=new LinkedList<>();
+    private List<Entity> children = new LinkedList<>();
 
     //================================================================================
     // Constructors
     //================================================================================
-
-    public Entity(Populace mojePopulace) {
-        this.populace = mojePopulace;
-    }
 
     /**
      * Copy constructor. This constructor makes hard copy of the object.
@@ -36,7 +35,7 @@ public class Entity implements Comparable<Entity> {
      */
     public Entity(Entity entity) {
         // TODO full hard copy
-        this.populace = entity.getPopulace();
+        this.population = entity.getPopulation();
         this.entityTask = entity.getEntityTask(); //dont need hard copy
         this.name = entity.getName(); //ok
         this.talent = entity.getTalent(); //ok
@@ -47,35 +46,24 @@ public class Entity implements Comparable<Entity> {
         this.children = entity.getChildren();//nok
     }
 
-    public Entity(Populace populace, String name, Double talent, Entity parentA, Entity parentB) {
-        this.populace = populace;
+    public Entity(Population population, String name, Double talent, Entity parentA, Entity parentB) {
+        this.population = population;
         this.name = name;
         this.talent = talent;
         this.parentA = parentA;
         this.parentB = parentB;
     }
 
-    public Entity(Populace populace, String name, Double talent) {
-        this.populace = populace;
+    public Entity(Population population, String name, Double talent) {
+        this.population = population;
         this.name = name;
         this.talent = talent;
         this.children = new LinkedList<>();
     }
 
-    @Override
-    public int compareTo(Entity entity) {
-        int i = Double.compare(entity.getTalent(), this.talent);
-        if (i != 0) {
-            return i;
-        }
-        return Double.compare(entity.getTalent(), this.talent);
-
-    }
-
-    @Override
-    public String toString() {
-        return "{" + this.name + '}';
-    }
+    //================================================================================
+    // General operation
+    //================================================================================
 
     public Task<Entity> createTask() {
         this.entityTask = new Task<>() {
@@ -92,7 +80,7 @@ public class Entity implements Comparable<Entity> {
     }
 
     private Entity obtainFittest() throws ExecutionException, InterruptedException {
-        Entity fittest = this.populace.findFittest();
+        Entity fittest = this.population.findFittest();
         if (fittest != this && fittest != null) { //v pripade, ze entita nezazadala sama o sebe
             fittest = fittest.entityTask.get(); //cekame nez dopocita
             return fittest;
@@ -100,28 +88,43 @@ public class Entity implements Comparable<Entity> {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return "{" + this.name + '}';
+    }
+
+    @Override
+    public int compareTo(Entity entity) {
+        int i = Double.compare(entity.getTalent(), this.talent);
+        if (i != 0) {
+            return i;
+        }
+        return Double.compare(entity.getTalent(), this.talent);
+
+    }
+
     //================================================================================
-    // Entity activities
+    // Entity operation
     //================================================================================
-    // region Activities
+    // region Operation
 
 
     private void gainSources() {
-        this.sources += this.talent * 1000;
-        System.out.println(this.toString() + " Have " + this.sources+" sources.");
+        this.sources = sources+(this.talent * SALARY_MULTIPLIER);
+        System.out.println(this.toString() + " Have " + this.sources + " sources.");
     }
 
     private void reproduce() throws Exception {
         // Selection of fittest partner for this Entity
         Entity fittest = this.selection();
-        System.out.println(this.toString() + " found fittest: " + fittest);
-        if (fittest == null) {
+        if (fittest == null|| this.getSources()<CHILD_EXPENSE) {
             return;
         }
+        System.out.println(this.toString() + " found fittest: " + fittest);
         // Crossover
         Entity child = new Entity(
-                this.populace,
-                "E" + this.populace.size(),
+                this.population,
+                "E" + this.population.size(),
                 this.crossover(fittest),
                 this,
                 fittest
@@ -133,9 +136,12 @@ public class Entity implements Comparable<Entity> {
         this.children.add(child);
         fittest.children.add(child);
 
+        // and have expenses...
+        this.setSources(sources-CHILD_EXPENSE);
+        fittest.setSources(fittest.getSources()-CHILD_EXPENSE);
         // Population have new member
-        this.populace.addEntity(child);
-        System.out.println(this.toString() + " are reproducing with" + fittest);
+        this.population.addEntity(child);
+        System.out.println(this.toString() + " are reproducing with " + fittest + " and they have " + child);
     }
 
     //Selection
@@ -143,7 +149,6 @@ public class Entity implements Comparable<Entity> {
         //Select the most fittest individual
         return this.obtainFittest();
     }
-
 
     //Crossover
     public double crossover(Entity fittest) {
@@ -180,12 +185,12 @@ public class Entity implements Comparable<Entity> {
     //================================================================================
     // region Accessors
 
-    public Populace getPopulace() {
-        return populace;
+    public Population getPopulation() {
+        return population;
     }
 
-    public void setPopulace(Populace populace) {
-        this.populace = populace;
+    public void setPopulation(Population population) {
+        this.population = population;
     }
 
     public Task<Entity> getEntityTask() {

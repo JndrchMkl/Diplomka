@@ -9,14 +9,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
+import static entitytask.SystemCore.CHILD_EXPENSE;
 import static java.util.stream.Collectors.toList;
 
-public class Populace {
+public class Population {
     // nad ním je mutex a nepustí entitu drive nez operaci nad listem dokonci
     // ---: alternativa CopyOnWriteArrayList - vzuziva "Magie" a zamergovava postupne operace nad listem
     private final List<Entity> populace = Collections.synchronizedList(new LinkedList<>());
     private final ExecutorService threadPool = Executors.newFixedThreadPool(4);
-    private final List<List<Entity>> historie = new LinkedList<>();
+    private final List<List<Entity>> historie = Collections.synchronizedList(new LinkedList<>());
 
     public void addEntity(Entity e) {
         populace.add(e);
@@ -35,7 +36,7 @@ public class Populace {
         Entity fittest, ent;
         while (!entityPriorityQueue.isEmpty()) {
             ent = entityPriorityQueue.poll();
-            if (ent.getSources() > 2000) {
+            if (ent.getSources() > CHILD_EXPENSE) {
                 fittest = ent;
                 return fittest;
             }
