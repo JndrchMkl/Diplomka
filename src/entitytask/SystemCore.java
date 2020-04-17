@@ -3,9 +3,10 @@ package entitytask;
 public class SystemCore {
     public static final double CHILD_EXPENSE = 2000.0;
     public static final double SALARY_MULTIPLIER = 100.0;
+    public static final int N_THREADS = 2;
     private static SystemCore single_instance = null; //Singleton
-    private static final int POPULATION_SIZE = 2;
-    private static final int END_TICK = 50;
+    private static final int POPULATION_SIZE = 200;
+    private static final int END_TICK = 200;
     private int actualTick = 0;
 
 
@@ -22,7 +23,7 @@ public class SystemCore {
         while (END_TICK != actualTick) {
             population.nextTick();
             System.out.println("Time tick " + actualTick + " has been done...");
-            System.out.println("---------------------------------------------------------------------------------------");
+//            System.out.println("---------------------------------------------------------------------------------------");
             actualTick++;
         }
     }

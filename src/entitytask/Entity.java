@@ -1,14 +1,9 @@
 package entitytask;
 
-import javafx.concurrent.Task;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SplittableRandom;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import static entitytask.SystemCore.CHILD_EXPENSE;
 import static entitytask.SystemCore.SALARY_MULTIPLIER;
@@ -26,6 +21,9 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
     private Entity parentA;
     private Entity parentB;
     private List<Entity> children = new LinkedList<>();
+
+
+    private Entity bestPartner;
 
     //================================================================================
     // Constructors
@@ -75,21 +73,17 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
     public Entity call() throws Exception {
         // add salary
         gainSources();
-        // reproduce, if enough sources
-        reproduce();
+        selection();
+//        reproduce();
         return Entity.this;
     }
 
-    private Entity obtainFittest() throws ExecutionException, InterruptedException, BrokenBarrierException {
-        System.out.println("Blocking " + this);
+    private Entity obtainFittest() throws ExecutionException, InterruptedException, BrokenBarrierException, TimeoutException {
         Entity fittest = this.population.findFittest(Entity.this);
-        System.out.println("Unblocking after find " + this);
-        if (fittest != null) { //v pripade, ze entita nezazadala sama o sebe
-            System.out.println("Blocking before call " + this);
-            fittest = fittest.entityFuture.get(); //cekame nez dopocita
-            System.out.println("Unblocking after call " + this);
-            return fittest;
-        }
+            if (fittest != null) { //v pripade, ze entita nezazadala sama o sebe
+                this.bestPartner=fittest;
+                return fittest;
+            }
         return null;
     }
 
@@ -116,32 +110,29 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
 
     private void gainSources() {
         this.sources = sources + (this.talent * SALARY_MULTIPLIER);
-        System.out.println(this.toString() + " Have " + this.sources + " sources.");
     }
 
-    private void reproduce() throws Exception {
+    public void reproduce() throws Exception {
         // Selection of fittest partner for this Entity
-        Entity fittest = this.selection();
-        System.out.println(this.toString() + " found fittest: " + fittest);
-        if (fittest == null || this.getSources() < CHILD_EXPENSE) {
+        if (bestPartner == null || this.getSources() < CHILD_EXPENSE) {
             return;
         }
         // Crossover
-        Entity child = crossover(fittest);
+        Entity child = crossover(bestPartner);
 
         //mutation
         this.mutation(child);
 
         // Tell them they're parents
         this.children.add(child);
-        fittest.children.add(child);
+        bestPartner.children.add(child);
 
         // and have expenses...
         this.setSources(sources - CHILD_EXPENSE);
-        fittest.setSources(fittest.getSources() - CHILD_EXPENSE);
+        bestPartner.setSources(bestPartner.getSources() - CHILD_EXPENSE);
         // Population have new member
         this.population.addEntity(child);
-        System.out.println(this.toString() + " are reproducing with " + fittest + " and they have " + child);
+//        System.out.println(this.toString() + " are reproducing with " + bestPartner + " and they have " + child);
     }
 
     //Selection
@@ -252,6 +243,15 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
 
     public void setChildren(List<Entity> children) {
         this.children = children;
+    }
+
+
+    public Entity getBestPartner() {
+        return bestPartner;
+    }
+
+    public void setBestPartner(Entity bestPartner) {
+        this.bestPartner = bestPartner;
     }
 
 

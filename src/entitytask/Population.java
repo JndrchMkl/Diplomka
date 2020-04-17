@@ -1,7 +1,5 @@
 package entitytask;
 
-//import javafx.concurrent.Task;
-
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,9 +11,9 @@ public class Population {
     // nad ním je mutex a nepustí entitu drive nez operaci nad listem dokonci
     // ---: alternativa CopyOnWriteArrayList - vzuziva "Magie" a zamergovava postupne operace nad listem
     private final List<Entity> population = Collections.synchronizedList(new LinkedList<>());
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(4);
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(SystemCore.N_THREADS);
     private final List<List<Entity>> history = Collections.synchronizedList(new LinkedList<>());
-    private List<Entity> entities;
+    private List<Entity> reproducableEntities;
 
     public void addEntity(Entity e) {
         population.add(e);
@@ -30,28 +28,47 @@ public class Population {
     }
 
     public synchronized Entity findFittest(Entity requesting) {
-        return entities.stream().sorted().filter(e -> !Objects.equals(e.getName(), requesting.getName())).findFirst().orElseGet(() -> null);
+        Entity bestPartner = reproducableEntities.stream().sorted()
+                .filter(e -> !Objects.equals(e.getName(), requesting.getName()))
+                .findFirst().orElse(null);
+        if (bestPartner != null) {
+            reproducableEntities.remove(requesting);
+            reproducableEntities.remove(bestPartner);
+        }
+        return bestPartner;
     }
 
     public void nextTick() {
-        entities = new LinkedList<>(population);
-        this.history.add(clonePopulation());
-        System.out.println("History has been logged...");
         try {
-            List<Future> allTickFutures = new ArrayList<Future>();
+            reproducableEntities = new LinkedList<>(population);
+            this.history.add(clonePopulation());
+
+            List<Future<Entity>> allTickFutures = new ArrayList<>();
             for (Entity entity : population) {
                 Future<Entity> future = threadPool.submit(entity);
                 entity.setEntityFuture(future);
                 allTickFutures.add(future);
             }
-            //neskoncime nextTick(), dokud nejsou dokonceny Future pro kazdou entitu
-            for (Future f : allTickFutures) {
-                f.get();
+
+            // Wait until every single Entity call() method has been done.
+            waitForPromises(allTickFutures);
+
+            for (Entity entity : new LinkedList<>(population)) {
+                entity.reproduce();
+                entity.setBestPartner(null);
             }
-            System.out.println("Results count: " + allTickFutures.size());
-            System.out.println("Results: " + Arrays.toString(allTickFutures.toArray()));
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+
+
+    private void waitForPromises(List<Future<Entity>> allTickFutures) throws InterruptedException, java.util.concurrent.ExecutionException {
+        //neskoncime nextTick(), dokud nejsou dokonceny Future pro kazdou entitu
+        //funguje jako bariera
+        for (Future f : allTickFutures) {
+            f.get();
         }
     }
 
