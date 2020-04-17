@@ -41,8 +41,8 @@ public class Entity implements Comparable<Entity> {
         this.name = entity.getName(); //ok
         this.talent = entity.getTalent(); //ok
         this.sources = entity.getSources();//ok
-//        this.parentA = entity.getParentA();//nok
-        this.parentA = new Entity(entity.getParentA().populace, entity.getParentA().getName(), entity.getParentA().getTalent(), entity.getParentA(), entity.getParentA()); //?? ok ???
+        this.parentA = entity.getParentA();//nok
+//        this.parentA = new Entity(entity.getParentA().populace, entity.getParentA().getName(), entity.getParentA().getTalent(), entity.getParentA(), entity.getParentA()); //?? ok ???
         this.parentB = entity.getParentB();//nok
         this.children = entity.getChildren();//nok
     }
