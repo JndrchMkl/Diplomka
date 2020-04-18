@@ -12,7 +12,7 @@ public class Population {
     // ---: alternativa CopyOnWriteArrayList - vzuziva "Magie" a zamergovava postupne operace nad listem
     private final List<Entity> population = Collections.synchronizedList(new LinkedList<>());
     private final ExecutorService threadPool = Executors.newFixedThreadPool(SystemCore.N_THREADS);
-    private final List<List<Entity>> history = Collections.synchronizedList(new LinkedList<>());
+
     private List<Entity> reproducableEntities;
 
     public void addEntity(Entity e) {
@@ -41,8 +41,6 @@ public class Population {
     public void nextTick() {
         try {
             reproducableEntities = new LinkedList<>(population);
-            this.history.add(clonePopulation());
-
             List<Future<Entity>> allTickFutures = new ArrayList<>();
             for (Entity entity : population) {
                 Future<Entity> future = threadPool.submit(entity);
@@ -50,7 +48,7 @@ public class Population {
                 allTickFutures.add(future);
             }
 
-            // Wait until every single Entity call() method has been done.
+            // Wait until every single genetics.Entity call() method has been done.
             waitForPromises(allTickFutures);
 
             for (Entity entity : new LinkedList<>(population)) {
@@ -61,8 +59,6 @@ public class Population {
             e.printStackTrace();
         }
     }
-
-
 
     private void waitForPromises(List<Future<Entity>> allTickFutures) throws InterruptedException, java.util.concurrent.ExecutionException {
         //neskoncime nextTick(), dokud nejsou dokonceny Future pro kazdou entitu

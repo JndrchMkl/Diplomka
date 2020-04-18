@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 
 import static entitytask.SystemCore.CHILD_EXPENSE;
 import static entitytask.SystemCore.SALARY_MULTIPLIER;
+import static java.util.stream.Collectors.toList;
 
 public class Entity implements Comparable<Entity>, Callable<Entity> {
 
@@ -37,15 +38,15 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
      */
     public Entity(Entity entity) {
         // TODO full hard copy
-        this.population = entity.getPopulation();
+        this.population = entity.getPopulation(); //dont need hard copy
         this.entityFuture = entity.getEntityFuture(); //dont need hard copy
         this.name = entity.getName(); //ok
         this.talent = entity.getTalent(); //ok
         this.sources = entity.getSources();//ok
-        this.parentA = entity.getParentA();//nok
-//        this.parentA = new Entity(entity.getParentA().populace, entity.getParentA().getName(), entity.getParentA().getTalent(), entity.getParentA(), entity.getParentA()); //?? ok ???
-        this.parentB = entity.getParentB();//nok
-        this.children = entity.getChildren();//nok
+        this.parentA =  new Entity(entity.getParentA()); //?? ok ???
+        this.parentB = new Entity(entity.getParentB());//nok
+        this.children = entity.getChildren().stream().map(Entity::new).collect(toList());
+
     }
 
     public Entity(Population population, String name, Double talent, Entity parentA, Entity parentB) {
@@ -103,7 +104,7 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
     }
 
     //================================================================================
-    // Entity operation
+    // genetics.Entity operation
     //================================================================================
     // region Operation
 
@@ -113,7 +114,7 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
     }
 
     public void reproduce() throws Exception {
-        // Selection of fittest partner for this Entity
+        // Selection of fittest partner for this genetics.Entity
         if (bestPartner == null || this.getSources() < CHILD_EXPENSE) {
             return;
         }
@@ -168,7 +169,7 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
 
         // 0.5% chance to mutate
         if (sr.nextInt(0, 5000) < 5) {
-            // anomaly talented Entity
+            // anomaly talented genetics.Entity
             double crossOverValue = sr.nextDouble(0.0, 11.0);
             child.setTalent(crossOverValue);
         }
