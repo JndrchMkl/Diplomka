@@ -1,24 +1,24 @@
 package entitytask;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 
 public class SystemCore {
     public static final double CHILD_EXPENSE = 2000.0;
     public static final double SALARY_MULTIPLIER = 100.0;
     public static final int N_THREADS = 2;
-    private static final int POPULATION_SIZE = 200;
+    public static final int POPULATION_SIZE = 200;
     public static final int END_TICK = 20;
     private int actualTick = 0;
     private static SystemCore single_instance = null; //Singleton
     private Population population = null;
-    private final List<List<Entity>> history = Collections.synchronizedList(new LinkedList<>());
+    private History history = null;
 
     private SystemCore() {
         population = new Population();
+        history = new History(population);
         LinkedList<Entity> intitSet = EntityGenerator.generate(population, POPULATION_SIZE);
+        System.out.println("Entry set of entities has been generated...");
         population.addAllEntities(intitSet);
         history.add(intitSet);
     }
@@ -27,13 +27,15 @@ public class SystemCore {
      * Starting simulation of evolving population.
      */
     public void run() {
-        System.out.println("Entry set of entities has been generated...");
+        System.out.println("Starting...");
         while (END_TICK != actualTick) {
-           population.nextTick();
+            population.nextTick();
             System.out.println("Time tick " + actualTick + " has been done...");
 //            System.out.println("---------------------------------------------------------------------------------------");
             actualTick++;
+            history.save();
         }
+        System.out.println("Ending...");
     }
 
     /**
@@ -48,7 +50,9 @@ public class SystemCore {
         return single_instance;
     }
 
-    public List<List<Entity>> history(){
-        return this.history;
+    public List<List<Entity>> history() {
+        return this.history.getHistory();
     }
+
+
 }
