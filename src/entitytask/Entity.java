@@ -43,10 +43,12 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
         this.name = entity.getName(); //ok
         this.talent = entity.getTalent(); //ok
         this.sources = entity.getSources();//ok
-//        this.parentA =  new Entity(entity.getParentA()); //?? ok ???
-        this.parentA =  new Entity(population,name,talent,entity.getParentA(),entity.getParentB());
-        this.parentB =  new Entity(population,name,talent,entity.getParentA(),entity.getParentB());
-//        this.parentB = new Entity(entity.getParentB());//nok
+        this.parentA= entity.getParentA();
+        this.parentB = entity.getParentB();
+//        Entity parentA = entity.getParentA();
+//        Entity parentB = entity.getParentB();
+//        this.parentA = parentA == null ? null : new Entity(parentA.getPopulation(), parentA.getName(), parentA.getTalent(), parentA, parentB);
+//        this.parentB = parentB == null ? null : new Entity(parentB.getPopulation(), parentB.getName(), parentB.getTalent(), parentA, parentB);
         this.children = entity.getChildren().stream().map(Entity::new).collect(toList());
 
     }
@@ -83,16 +85,18 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
 
     private Entity obtainFittest() throws ExecutionException, InterruptedException, BrokenBarrierException, TimeoutException {
         Entity fittest = this.population.findFittest(Entity.this);
-            if (fittest != null) { //v pripade, ze entita nezazadala sama o sebe
-                this.bestPartner=fittest;
-                return fittest;
-            }
+        if (fittest != null) { //v pripade, ze entita nezazadala sama o sebe
+            this.bestPartner = fittest;
+            return fittest;
+        }
         return null;
     }
 
     @Override
     public String toString() {
-        return "{" + this.name + '}';
+//        String parents = parentA != null && parentB != null ? "{parents=" + parentA.getName() + ", " + parentB.getName() + "}" : "";
+//        return "{name=" + this.name + parents + '}';
+        return "{name=" + this.name + '}';
     }
 
     @Override
@@ -117,7 +121,7 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
 
     public void reproduce() throws Exception {
         // Selection of fittest partner for this genetics.Entity
-        if (bestPartner == null || this.getSources() < CHILD_EXPENSE) {
+        if (bestPartner == null ) {
             return;
         }
         // Crossover

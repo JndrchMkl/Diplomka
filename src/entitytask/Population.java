@@ -5,6 +5,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static entitytask.SystemCore.CHILD_EXPENSE;
+
 public class Population {
     // nad ním je mutex a nepustí entitu drive nez operaci nad listem dokonci
     // ---: alternativa CopyOnWriteArrayList - vzuziva "Magie" a zamergovava postupne operace nad listem
@@ -26,9 +28,16 @@ public class Population {
     }
 
     public synchronized Entity findFittest(Entity requesting) {
-        Entity bestPartner = reproducableEntities.stream().sorted()
-                .filter(e -> !Objects.equals(e.getName(), requesting.getName()))
-                .findFirst().orElse(null);
+        if (requesting.getSources()<CHILD_EXPENSE)
+            return null;
+        Entity bestPartner=null;
+        Collections.sort(reproducableEntities);
+        for (Entity e :reproducableEntities) {
+            if (e.getSources()>CHILD_EXPENSE&&!Objects.equals(e, requesting)) {
+                bestPartner = e;
+                break;
+            }
+        }
         if (bestPartner != null) {
             reproducableEntities.remove(requesting);
             reproducableEntities.remove(bestPartner);

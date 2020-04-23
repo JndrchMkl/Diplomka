@@ -19,6 +19,8 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.Stack;
 
+import static entitytask.SystemCore.INIT_SET;
+
 public class GUI extends Application {
     private final SystemCore sys = SystemCore.getInstance();
 
@@ -112,10 +114,15 @@ public class GUI extends Application {
 
 
         int index = (int) timeLine.getValue()-1;
-        List<Entity> actualPopulation = sys.history().get(index);
+        List<Entity> actualTablePopulation;
+        if (index > 0 | index < sys.history().size()) {
+            actualTablePopulation = sys.history().get(index);
+        } else {
+            actualTablePopulation=INIT_SET;
+        }
 
         // Build nodes
-        BuildTreeItemNodes(rootNode, actualPopulation);
+        BuildTreeItemNodes(rootNode, actualTablePopulation);
 
         //set maximum of slider
         setTimeLineSliderProperties();

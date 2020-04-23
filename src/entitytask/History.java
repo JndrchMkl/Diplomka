@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 public class History {
     private final List<List<Entity>> history = Collections.synchronizedList(new LinkedList<>());
     private final Population population;
@@ -35,6 +33,13 @@ public class History {
     }
 
     private List<Entity> clonePopulation() {
-        return this.population.state().stream().map(Entity::new).collect(toList());
+        LinkedList<Entity> clonedList = new LinkedList<>();
+        for (Entity e : population.state()) {
+            Entity clone =  new Entity(e);
+//            Entity clone =  e.clone();
+//            Entity clone = SerializationUtils.clone(e);
+            clonedList.add(clone);
+        }
+        return clonedList;
     }
 }

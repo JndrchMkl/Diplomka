@@ -9,6 +9,7 @@ public class SystemCore {
     public static final int N_THREADS = 2;
     public static final int POPULATION_SIZE = 200;
     public static final int END_TICK = 20;
+    public static LinkedList<Entity> INIT_SET;
     private int actualTick = 0;
     private static SystemCore single_instance = null; //Singleton
     private Population population = null;
@@ -17,10 +18,10 @@ public class SystemCore {
     private SystemCore() {
         population = new Population();
         history = new History(population);
-        LinkedList<Entity> intitSet = EntityGenerator.generate(population, POPULATION_SIZE);
+        INIT_SET = EntityGenerator.generate(population, POPULATION_SIZE);
         System.out.println("Entry set of entities has been generated...");
-        population.addAllEntities(intitSet);
-        history.add(intitSet);
+        population.addAllEntities(INIT_SET);
+        history.add(INIT_SET);
     }
 
     /**
