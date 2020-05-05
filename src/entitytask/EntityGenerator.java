@@ -5,7 +5,7 @@ import java.util.PriorityQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EntityGenerator {
-   static int counter=0;
+   private static int counter = 0;
 
     public static LinkedList<Entity> generate(Population population, int size) {
         LinkedList<Entity> entityList = new LinkedList<>();

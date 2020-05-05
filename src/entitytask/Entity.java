@@ -79,7 +79,6 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
         // add salary
         gainSources();
         selection();
-//        reproduce();
         return Entity.this;
     }
 
@@ -94,9 +93,7 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
 
     @Override
     public String toString() {
-//        String parents = parentA != null && parentB != null ? "{parents=" + parentA.getName() + ", " + parentB.getName() + "}" : "";
-//        return "{name=" + this.name + parents + '}';
-        return "{name=" + this.name + '}';
+        return "{" + this.name + '}';
     }
 
     @Override
@@ -110,7 +107,7 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
     }
 
     //================================================================================
-    // genetics.Entity operation
+    // Entity operation
     //================================================================================
     // region Operation
 
@@ -120,7 +117,7 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
     }
 
     public void reproduce() throws Exception {
-        // Selection of fittest partner for this genetics.Entity
+        // Selection of fittest partner for this Entity
         if (bestPartner == null ) {
             return;
         }
@@ -175,7 +172,7 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
 
         // 0.5% chance to mutate
         if (sr.nextInt(0, 5000) < 5) {
-            // anomaly talented genetics.Entity
+            // anomaly talented Entity
             double crossOverValue = sr.nextDouble(0.0, 11.0);
             child.setTalent(crossOverValue);
         }
