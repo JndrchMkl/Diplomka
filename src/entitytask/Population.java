@@ -28,12 +28,11 @@ public class Population {
     }
 
     public synchronized Entity findFittest(Entity requesting) {
-        if (requesting.getSources()<CHILD_EXPENSE)
+        if (requesting.getSources() < CHILD_EXPENSE)
             return null;
-        Entity bestPartner=null;
-        Collections.sort(reproducableEntities);
-        for (Entity e :reproducableEntities) {
-            if (e.getSources()>CHILD_EXPENSE&&!Objects.equals(e, requesting)) {
+        Entity bestPartner = null;
+        for (Entity e : reproducableEntities) {
+            if (e.getSources() > CHILD_EXPENSE && !Objects.equals(e, requesting)) {
                 bestPartner = e;
                 break;
             }
@@ -48,6 +47,7 @@ public class Population {
     public void nextTick() {
         try {
             reproducableEntities = new LinkedList<>(actualPopulation);
+            Collections.sort(reproducableEntities);
             List<Future<Entity>> allTickFutures = new ArrayList<>();
             for (Entity entity : actualPopulation) {
                 Future<Entity> future = threadPool.submit(entity);
@@ -55,7 +55,7 @@ public class Population {
                 allTickFutures.add(future);
             }
 
-            // Wait until every single genetics.Entity call() method has been done.
+            // Wait until every single Entity call() method has been done.
             waitForPromises(allTickFutures);
 
             for (Entity entity : new LinkedList<>(actualPopulation)) {
