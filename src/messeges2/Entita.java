@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import static messeges2.MessageType.*;
 import static messeges2.TimeUtils.systemNanoTime;
 
 public class Entita implements Runnable {
@@ -17,6 +18,10 @@ public class Entita implements Runnable {
     private boolean isAlive = true;
     private Queue<String> messages;
     private boolean intentWantChild;
+    private String COMMA = ",";
+    ;
+    private Thread thread;
+    private int CHILD_EXPENSE = 10;
 
     public Entita(PostOffice postOffice, double sources, double talent) {
         this.sources = sources;
@@ -27,14 +32,15 @@ public class Entita implements Runnable {
         this.isAlive = false;
         this.intentWantChild = false;
         messages = new LinkedList<>();
-        postOffice.createMailbox(this.toString());
+        postOffice.createMailbox(name());
+        thread = new Thread(this);
 //        Thread thread = new Thread(this);
 //        thread.start();
     }
 
     @Override
     public void run() {
-        System.out.println("Hello " + this.toString());
+        System.out.println("Hello " + name());
         while (isAlive) {
             // Phase 1 - upkeep
             // timestamps
@@ -48,17 +54,13 @@ public class Entita implements Runnable {
             }
 
             // vyzvedni postu
-            messages.addAll(postOffice.inbox(this.toString()));
+            messages.addAll(postOffice.inbox(name()));
             salary(interval);
             liveCosts(interval);
 
             // Choose your intent
-            intentWantChild = sources > 10;
+            intentWantChild = sources > CHILD_EXPENSE;
             // TODO
-
-
-            // Phase 2 - process messages
-            String message = messages.poll();//del
             if (intentWantChild) {
                 //1 harvest accept baby from others
                 //1 pribalim s acceptem prachy, pri prijmuti odectu z this prachy
@@ -69,18 +71,61 @@ public class Entita implements Runnable {
 
 //                    LinkedList<String> partnerCandidateMessages = messages.stream().map(m c m.contains("chciDite"))
 
-                for (String messege : messages) {
-                    if (messege.contains("chciDite")) {
-//                        partnerCandidateMessages.add(messege);
-                    }
+//                for (String messege : messages) {
+//                    if (messege.contains("chciDite")) {
+////                        partnerCandidateMessages.add(messege);
+//                    }
+//
+//                }
+                postOffice.notifyAll(name(), WANT_BABY.value + talent + COMMA + sources + COMMA + name());
+            }
 
+
+            // Phase 2 - process messages
+
+
+            while (!messages.isEmpty()) {
+                String message = messages.poll();//read and del
+
+                if (message.contains(WANT_BABY.value)) {
+                    // candidate of having baby
+                    // 1 - accept first
+                    // 2 - accept best
+                    String[] data = message.split(COMMA);
+                    double partnerParent = Double.parseDouble(data[1]);
+                    postOffice.notifyTo(data[3], ACCEPT_BABY.value + COMMA + talent + COMMA + sources);
+                    sources = sources - CHILD_EXPENSE;
                 }
-                postOffice.notifyAll(this.toString(), "chciDite," + talent + "," + sources);
+                if (message.contains(ACCEPT_BABY.value)) {
+                    String[] data = message.split(COMMA);
+                    double partnerParent = Double.parseDouble(data[1]);
+                    this.sources = sources - CHILD_EXPENSE;
+                    Entita child = new Entita(postOffice, 0, (this.talent + partnerParent) / 2);
+                    child.thread().start();
+                }
+                if (message.contains(GIVE_SOURCE.value)) {
+                    String[] data = message.split(COMMA);
+                    double gift = Double.parseDouble(data[1]);
+                    sources = sources + gift;
+                }
+                if (message.contains(WANT_STEAL.value)) {
+                    String[] data = message.split(COMMA);
+                    postOffice.notifyTo(data[1], GIVE_SOURCE.value + COMMA + sources);
+                    sources = 0;
+                }
+                if (message.contains(WANT_KILL.value)) {
+                    String[] data = message.split(COMMA);
+                    postOffice.notifyTo(data[1], GIVE_SOURCE.value + COMMA + sources);
+                    this.die();
+                }
             }
-            if (message.contains("chciDite")) {
-                postOffice.notifyAll(this.toString(), "chciDite," + talent + "," + sources);
-            }
+
+
         }
+    }
+
+    private String name() {
+        return thread.getName();
     }
 
     void salary(float timeInterval) {
@@ -97,6 +142,6 @@ public class Entita implements Runnable {
     }
 
     Thread thread() {
-        return new Thread(this);
+        return thread;
     }
 }
