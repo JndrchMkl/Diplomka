@@ -11,10 +11,12 @@ public class PostOffice {
         inbox(owner).add(message);
     }
 
-    void notifyAll(String message) {
+    void notifyAll(String sender, String message) {
         for (String owner : postOffice.keySet()) {
-            inbox(owner).add(message);
+            if (!owner.equals(sender))
+                notifyTo(owner, message);
         }
+//        inbox(sender).remove(message);
     }
 
     void createMailbox(String owner) {

@@ -28,8 +28,8 @@ public class Entita implements Runnable {
         this.intentWantChild = false;
         messages = new LinkedList<>();
         postOffice.createMailbox(this.toString());
-        Thread thread = new Thread(this);
-        thread.start();
+//        Thread thread = new Thread(this);
+//        thread.start();
     }
 
     @Override
@@ -51,11 +51,9 @@ public class Entita implements Runnable {
             messages.addAll(postOffice.inbox(this.toString()));
             salary(interval);
             liveCosts(interval);
+
             // Choose your intent
-            if (sources > 10)
-                intentWantChild = true;
-            else
-                intentWantChild = false;
+            intentWantChild = sources > 10;
             // TODO
 
 
@@ -73,14 +71,14 @@ public class Entita implements Runnable {
 
                 for (String messege : messages) {
                     if (messege.contains("chciDite")) {
-                        partnerCandidateMessages.add(messege);
+//                        partnerCandidateMessages.add(messege);
                     }
 
                 }
-                postOffice.notifyAll("chciDite," + talent + "," + sources);
+                postOffice.notifyAll(this.toString(), "chciDite," + talent + "," + sources);
             }
             if (message.contains("chciDite")) {
-                postOffice.notifyAll("chciDite," + talent + "," + sources);
+                postOffice.notifyAll(this.toString(), "chciDite," + talent + "," + sources);
             }
         }
     }
@@ -96,5 +94,9 @@ public class Entita implements Runnable {
 
     void die() {
         isAlive = false;
+    }
+
+    Thread thread() {
+        return new Thread(this);
     }
 }
