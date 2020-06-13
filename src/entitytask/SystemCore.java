@@ -9,7 +9,7 @@ public class SystemCore {
     public static final double SALARY_MULTIPLIER = 100.0;
     public static final int N_THREADS = 2;
     public static final int POPULATION_SIZE = 2;
-    public static final int END_TICK = 50;
+    public static final int END_TICK = 10;
     public static LinkedList<Entity> INIT_SET;
     private Population population = null;
     private History history = null;

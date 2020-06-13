@@ -16,11 +16,30 @@ public class AcceptBaby implements Message {
     // zpracovani probiha ve vlakne receivera, takze na sendera nesahat
     // pokud jsou potreba informace o senderovi pridat pro ne aribut
     public void process() {
-        Entity child = new Entity();
-        sender.setSources(sender.getSources() - SystemCore.CHILD_EXPENSE);
+        Entity child = crossover();
+
+        //rekni entitam že mají dítě
         sender.getChildren().add(child);
-        receiver.setSources(receiver.getSources() - SystemCore.CHILD_EXPENSE);
         receiver.getChildren().add(child);
+
+        // rekni populaci ze jim pribyl jedna nová entita
+        sender.getPopulation().addEntity(child);
+
+    }
+
+    public Entity crossover() {
+
+        //Select crossover value
+        Double crossOverValueOne = sender.getTalent();
+        Double crossOverValueTwo = receiver.getTalent();
+        Entity child = new Entity(
+                this.sender.getPopulation(),
+                "E" + sender.getPopulation().state().size(),
+                (crossOverValueOne + crossOverValueTwo) / 2,
+                sender,
+                receiver
+        );
+        return child;
     }
 
 }

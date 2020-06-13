@@ -15,5 +15,6 @@ public class RefuseBaby implements Message {
     @Override
     public void process() {
         sender.setSources(sender.getSources() + SystemCore.CHILD_EXPENSE);//unblock resources
+        receiver.setSources(receiver.getSources() + SystemCore.CHILD_EXPENSE);//unblock resources
     }
 }

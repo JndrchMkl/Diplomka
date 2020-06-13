@@ -263,7 +263,5 @@ public class Entity implements Comparable<Entity>, Callable<Entity> {
 
     //endregion
 
-    public void addMessage(Message confirmBaby) {
-    }
 
 }
