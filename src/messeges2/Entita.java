@@ -28,12 +28,12 @@ public class Entita implements Runnable {
         this.talent = talent;
         this.postOffice = postOffice;
         this.timestampPresent = systemNanoTime();
-        this.timestampEnd = timestampPresent + 50000;
-        this.isAlive = false;
+        this.timestampEnd = timestampPresent + 500000000;
+        this.isAlive = true;
         this.intentWantChild = false;
         messages = new LinkedList<>();
-        postOffice.createMailbox(name());
         thread = new Thread(this);
+        postOffice.createMailbox(name());
 //        Thread thread = new Thread(this);
 //        thread.start();
     }
@@ -77,44 +77,45 @@ public class Entita implements Runnable {
 //                    }
 //
 //                }
-                postOffice.notifyAll(name(), WANT_BABY.value + talent + COMMA + sources + COMMA + name());
+                postOffice.notifyAll(name(), WANT_BABY.value + COMMA + talent + COMMA + sources + COMMA + name());
             }
 
 
             // Phase 2 - process messages
-
+            System.out.println(name() + " processing messages...");
 
             while (!messages.isEmpty()) {
                 String message = messages.poll();//read and del
+                String[] data = message.split(COMMA);
 
                 if (message.contains(WANT_BABY.value)) {
                     // candidate of having baby
-                    // 1 - accept first
-                    // 2 - accept best
-                    String[] data = message.split(COMMA);
+                    // option 1 - accept first
+                    // option 2 - accept best
+
                     double partnerParent = Double.parseDouble(data[1]);
-                    postOffice.notifyTo(data[3], ACCEPT_BABY.value + COMMA + talent + COMMA + sources);
+                    postOffice.notifyTo(data[2], ACCEPT_BABY.value + COMMA + talent + COMMA + sources);
                     sources = sources - CHILD_EXPENSE;
                 }
                 if (message.contains(ACCEPT_BABY.value)) {
-                    String[] data = message.split(COMMA);
+
                     double partnerParent = Double.parseDouble(data[1]);
                     this.sources = sources - CHILD_EXPENSE;
                     Entita child = new Entita(postOffice, 0, (this.talent + partnerParent) / 2);
                     child.thread().start();
                 }
                 if (message.contains(GIVE_SOURCE.value)) {
-                    String[] data = message.split(COMMA);
+
                     double gift = Double.parseDouble(data[1]);
                     sources = sources + gift;
                 }
                 if (message.contains(WANT_STEAL.value)) {
-                    String[] data = message.split(COMMA);
+
                     postOffice.notifyTo(data[1], GIVE_SOURCE.value + COMMA + sources);
                     sources = 0;
                 }
                 if (message.contains(WANT_KILL.value)) {
-                    String[] data = message.split(COMMA);
+
                     postOffice.notifyTo(data[1], GIVE_SOURCE.value + COMMA + sources);
                     this.die();
                 }
