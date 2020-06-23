@@ -1,10 +1,8 @@
 package messeges2;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -12,7 +10,10 @@ public class PostOffice {
     ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> postOffice = new ConcurrentHashMap<>();
 
     void notifyTo(String owner, String message) {
-        inbox(owner).add(message);
+        Queue<String> inbox = inbox(owner);
+        if (inbox != null) {
+            inbox(owner).add(message);
+        }
     }
 
     void notifyRandom(String message) {

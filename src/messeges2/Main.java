@@ -21,14 +21,8 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        int x = 4;
         PostOffice postOffice = new PostOffice();
         LinkedList<Entita> initList = generate(postOffice, 2);
-        System.out.println("Starting!");
-        for (Entita e : initList) {
-            e.thread().start();
-        }
 
-        System.out.println("Done!");
     }
 }

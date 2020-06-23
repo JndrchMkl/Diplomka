@@ -44,8 +44,8 @@ public class Entita implements Runnable {
         this.talent = talent;
         this.postOffice = postOffice;
         this.timestampPresent = timeNow(); //actual time zero
-//        this.timestampEnd = timestampPresent +(2* ThreadLocalRandom.current().nextDouble(5.0, 25.0));
-        this.timestampEnd = timestampPresent * 2;
+        this.timestampEnd = timestampPresent + (1000000000 * ThreadLocalRandom.current().nextDouble(5.0, 95.0));
+//        this.timestampEnd = timestampPresent * 2;
         this.isAlive = true;
         this.intentLookForYourNewPartner = false;
         this.intentDecideWhoIsPartnerRightNow = false;
@@ -59,6 +59,7 @@ public class Entita implements Runnable {
         intervalList = new LinkedList<>();
         thread = new Thread(this);
         postOffice.createMailbox(name());
+        thread.start();
     }
 
     private double calculateAverage(List<Double> marks) {
@@ -74,7 +75,7 @@ public class Entita implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Hello I am new " + name() + ", " + talent + ", " + patience);
+//        System.out.println("Hello I am new " + name() + ", " + talent + ", " + patience);
         while (isAlive) {
             /// Phase 1 - upkeep
             // timestamps
@@ -90,6 +91,7 @@ public class Entita implements Runnable {
             if (timestampPresent > timestampEnd) {
                 die();
                 postOffice.removeMailbox(name());
+                System.out.println("ZMRD!!! " + name());
                 return;
             }
 
@@ -135,10 +137,11 @@ public class Entita implements Runnable {
 //                    System.out.println(name() + " - TIMEOUT - found " + best[2]);
                     sources = sources - CHILD_EXPENSE;
                     Entita child = new Entita(postOffice, 0, (talent + Double.parseDouble(best[1])) / 2);
-                    child.thread().start();
+//                    child.thread().start();
                     postOffice.notifyTo(best[2], YOU_ARE_DAD.value + COMMA + talent + COMMA + sources + COMMA + name());
                     timeStopWatch = 0;
                     potentialPartners.clear();
+                    System.out.println("We did IT!!!! mother: " + this.name() + ", father: " + best[2] + ", new born" + child.name());
                 }
             }
             // 03 - Process the intent
@@ -177,12 +180,12 @@ public class Entita implements Runnable {
                         sources -= CHILD_EXPENSE;
                         postOffice.notifyTo(data[3], GIVE_SOURCE.value + COMMA + CHILD_EXPENSE);
                     }
-                    System.out.println(name() + " Processing - YOU_ARE_DAD");
+//                    System.out.println(name() + " Processing - YOU_ARE_DAD");
                 }
                 if (data[0].equals(GIVE_SOURCE.value)) {
                     double gift = Double.parseDouble(data[1]);
                     sources = sources + gift;
-                    System.out.println(name() + " Processing - GIVE_SOURCE");
+//                    System.out.println(name() + " Processing - GIVE_SOURCE");
                 }
 //                if (data[0].equals(WANT_STEAL.value)) {
 //                    if (perception < Float.parseFloat(data[2])) {
