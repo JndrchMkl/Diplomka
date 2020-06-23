@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class PostOffice {
-    HashMap<String, ConcurrentLinkedQueue<String>> postOffice = new HashMap<>();
+    ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> postOffice = new ConcurrentHashMap<>();
 
     void notifyTo(String owner, String message) {
         inbox(owner).add(message);
@@ -43,10 +43,10 @@ public class PostOffice {
         return postOffice.get(owner);
     }
 
-    Queue<String> withdraw(String owner) {
-        Queue<String> messages = inbox(owner);
-        inbox(owner).clear();
-        return postOffice.get(owner);
+    Queue<String> withdrawMessages(String owner) {
+        Queue<String> messages = new LinkedList<>(inbox(owner));
+        postOffice.put(owner, new ConcurrentLinkedQueue<>());
+        return messages;
     }
 
     void removeMailbox(String owner) {

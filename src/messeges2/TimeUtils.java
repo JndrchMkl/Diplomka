@@ -15,6 +15,10 @@ public class TimeUtils extends Thread {
         return System.nanoTime();
     }
 
+    public static double systemSecondsTime() {
+        return System.nanoTime() / 1000000000.0;
+    }
+
     public static long nowNanoTime() {
         return Instant.now().getNano();
     }
