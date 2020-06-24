@@ -7,16 +7,16 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class PostOffice {
-    ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> postOffice = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, ConcurrentLinkedQueue<String[]>> postOffice = new ConcurrentHashMap<>();
 
-    void notifyTo(String owner, String message) {
-        Queue<String> inbox = inbox(owner);
+    void notifyTo(String owner, String[] message) {
+        Queue<String[]> inbox = inbox(owner);
         if (inbox != null) {
             inbox(owner).add(message);
         }
     }
 
-    void notifyRandom(String message) {
+    void notifyRandom(String[] message) {
         int i = 0;
         int index = ThreadLocalRandom.current().nextInt(0, postOffice.keySet().size() - 1);
 
@@ -29,7 +29,7 @@ public class PostOffice {
         }
     }
 
-    void notifyAll(String sender, String message) {
+    void notifyAll(String sender, String[] message) {
         for (String owner : postOffice.keySet()) {
             if (!owner.equals(sender))
                 notifyTo(owner, message);
@@ -40,12 +40,12 @@ public class PostOffice {
         postOffice.put(owner, new ConcurrentLinkedQueue<>());
     }
 
-    Queue<String> inbox(String owner) {
+    Queue<String[]> inbox(String owner) {
         return postOffice.get(owner);
     }
 
-    Queue<String> withdrawMessages(String owner) {
-        Queue<String> messages = new LinkedList<>(inbox(owner));
+    Queue<String[]> withdrawMessages(String owner) {
+        Queue<String[]> messages = new LinkedList<>(inbox(owner));
         postOffice.put(owner, new ConcurrentLinkedQueue<>());
         return messages;
     }

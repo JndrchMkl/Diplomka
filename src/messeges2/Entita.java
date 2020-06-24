@@ -23,8 +23,8 @@ public class Entita implements Runnable {
     private double timestampEnd;
     private double timeout;
     private PostOffice postOffice;
-    private Queue<String> messages;
-    private Queue<String> potentialPartners;
+    private Queue<String[]> messages;
+    private Queue<String[]> potentialPartners;
     private List<Double> intervalList;
     private boolean isAlive;
     private boolean intentLookForYourNewPartner;
@@ -33,6 +33,7 @@ public class Entita implements Runnable {
     private boolean intentMurder;
     private Thread thread;
     private int nTicks = 0;
+    private int nMessages = 0;
 
     //    protected final int CHILD_EXPENSE = 1000000;
     protected final int CHILD_EXPENSE = 1;
@@ -88,17 +89,18 @@ public class Entita implements Runnable {
 
 
             // zemri starim (nebo hladověním)
-            if (timestampPresent > timestampEnd) {
-                die();
-                postOffice.removeMailbox(name());
-                System.out.println("ZMRD!!! " + name());
-                return;
-            }
+//            if (timestampPresent > timestampEnd) {
+//                die();
+//                postOffice.removeMailbox(name());
+//                System.out.println("SMRT!!! " + name());
+//                return;
+//            }
 
             // income
             messages.addAll(postOffice.withdrawMessages(name()));
             salary(interval);
             liveCosts(interval);
+            nMessages += messages.size();
 
             // Intents
             // 01 - Process the intent
@@ -106,7 +108,7 @@ public class Entita implements Runnable {
                 // option 1 - notify every single entity
                 // option 2 - notify all entities, but tell them requirements on parameters - NOVA ZPRAVA LOOKING_FOR_PARTNER_WITH_PARAMETERS
                 // option 3 - notify entity directly - našel jsem si partnera a už nechci žádného jiného...
-                postOffice.notifyAll(name(), LOOKING_FOR_PARTNER.value + COMMA + talent + COMMA + sources + COMMA + name());
+                postOffice.notifyAll(name(), new String[]{LOOKING_FOR_PARTNER.value, "" + talent, "" + sources, name()});
 //                System.out.println(name() + " notifying all - LOOKING_FOR_PARTNER");
 
                 if (timeout == 0) {
@@ -121,27 +123,26 @@ public class Entita implements Runnable {
                 // candidate of having baby
                 // option 1 - accept first
                 // option 2 - accept best by some criterium talent, age, strength, patience
-                Double mostTalented = 0.0;
+                String mostTalented = "0.0";
                 String[] best = null;
 
 //                System.out.println(name() + " - TIMEOUT");
-                for (String pp : potentialPartners) {
-                    String[] data = pp.split(COMMA);
-                    Double talent = Double.parseDouble(data[0]);
-                    if (talent.compareTo(mostTalented) > 0) { // TODO faster way to compare talents, without parsing
-                        mostTalented = talent;
+                for (String[] data : potentialPartners) {
+                    if (data[0].compareTo(mostTalented) > 0) { // TODO faster way to compare talents, without parsing
+                        mostTalented = data[0];
                         best = data;
                     }
                 }
                 if (best != null) {
+                    System.out.println("nMessages: " + nMessages);
+                    nMessages = 0;
 //                    System.out.println(name() + " - TIMEOUT - found " + best[2]);
                     sources = sources - CHILD_EXPENSE;
                     Entita child = new Entita(postOffice, 0, (talent + Double.parseDouble(best[1])) / 2);
-//                    child.thread().start();
-                    postOffice.notifyTo(best[2], YOU_ARE_DAD.value + COMMA + talent + COMMA + sources + COMMA + name());
+                    postOffice.notifyTo(best[2], new String[]{YOU_ARE_DAD.value, "" + talent, "" + sources, name()});
                     timeStopWatch = 0;
                     potentialPartners.clear();
-                    System.out.println("We did IT!!!! mother: " + this.name() + ", father: " + best[2] + ", new born" + child.name());
+                    System.out.println("We did IT!!!! mother: " + this.name() + ", father: " + best[2] + ", new born: " + child.name());
                 }
             }
             // 03 - Process the intent
@@ -163,39 +164,38 @@ public class Entita implements Runnable {
 
             /// Phase 2 - process messages
             while (!messages.isEmpty()) {
-                String message = messages.poll();//read and del
-                String[] data = message.split(COMMA); // TODO null pointer
+                String[] message = messages.poll();//read and del
 
-                if (data[0].equals(LOOKING_FOR_PARTNER.value)) {
+                if (message[0].equals(LOOKING_FOR_PARTNER.value)) {
                     //odpovidam yes partner (nebo mlcim a ignoruji)
-                    postOffice.notifyTo(data[3], YES_PARTNER.value + COMMA + talent + COMMA + sources + COMMA + name());
+                    postOffice.notifyTo(message[3], new String[]{YES_PARTNER.value, "" + talent, "" + sources, name()});
 //                    System.out.println(name() + " Processing - LOOKING_FOR_PARTNER");
                 }
-                if (data[0].equals(YES_PARTNER.value)) {
-                    potentialPartners.add(data[1] + COMMA + data[2] + COMMA + data[3]);
-//                    System.out.println(" Processing - YES_PARTNER : Entity " + name() + " accepting " + data[3] + " as a partner...");
+                if (message[0].equals(YES_PARTNER.value)) {
+                    potentialPartners.add(new String[]{message[1], message[2], message[3]});
+//                    System.out.println(" Processing - YES_PARTNER : Entity " + name() + " accepting " + message[3] + " as a partner...");
                 }
-                if (data[0].equals(YOU_ARE_DAD.value)) {
+                if (message[0].equals(YOU_ARE_DAD.value)) {
                     if (sources > CHILD_EXPENSE) {
                         sources -= CHILD_EXPENSE;
-                        postOffice.notifyTo(data[3], GIVE_SOURCE.value + COMMA + CHILD_EXPENSE);
+                        postOffice.notifyTo(message[3], new String[]{GIVE_SOURCE.value, "" + CHILD_EXPENSE});
                     }
 //                    System.out.println(name() + " Processing - YOU_ARE_DAD");
                 }
-                if (data[0].equals(GIVE_SOURCE.value)) {
-                    double gift = Double.parseDouble(data[1]);
+                if (message[0].equals(GIVE_SOURCE.value)) {
+                    double gift = Double.parseDouble(message[1]);
                     sources = sources + gift;
 //                    System.out.println(name() + " Processing - GIVE_SOURCE");
                 }
-//                if (data[0].equals(WANT_STEAL.value)) {
-//                    if (perception < Float.parseFloat(data[2])) {
-//                        postOffice.notifyTo(data[1], GIVE_SOURCE.value + COMMA + sources);
+//                if (message[0].equals(WANT_STEAL.value)) {
+//                    if (perception < Float.parseFloat(message[2])) {
+//                        postOffice.notifyTo(message[1], GIVE_SOURCE.value + COMMA + sources);
 //                        sources = 0;
 //                    }
 //                }
-//                if (data[0].contains(WANT_KILL.value)) {
-//                    if (strength < Float.parseFloat(data[2])) {
-//                        postOffice.notifyTo(data[1], GIVE_SOURCE.value + COMMA + sources);
+//                if (message[0].contains(WANT_KILL.value)) {
+//                    if (strength < Float.parseFloat(message[2])) {
+//                        postOffice.notifyTo(message[1], GIVE_SOURCE.value + COMMA + sources);
 //                        sources = 0;
 //                        this.die();
 //                    }
