@@ -1,7 +1,6 @@
 package messeges2;
 
 
-import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -25,6 +24,7 @@ public class Entita implements Runnable {
     private double timestampEnd;
     private double timeout;
     private PostOffice postOffice;
+    private Matrika matrika;
     private Queue<String[]> messages;
     private Queue<String[]> potentialPartners;
     private List<Double> intervalList;
@@ -42,10 +42,11 @@ public class Entita implements Runnable {
     protected final String COMMA = ",";
     private double timeStopWatch = 0;
 
-    public Entita(PostOffice postOffice, double sources, double talent) {
+    public Entita(Matrika matrika, PostOffice postOffice, double sources, double talent) {
         this.sources = sources;
         this.talent = talent;
         this.postOffice = postOffice;
+        this.matrika = matrika;
         this.timestampPresent = timeNow(); //actual time zero
         this.timestampEnd = timestampPresent + (1000000000 * ThreadLocalRandom.current().nextDouble(50.0, 115.0));
 //        this.timestampEnd = timestampPresent * 2;
@@ -62,6 +63,7 @@ public class Entita implements Runnable {
         intervalList = new LinkedList<>();
         thread = new Thread(this);
         postOffice.createMailbox(name());
+        matrika.createChroniqueRecord(name());
         thread.start();
     }
 
@@ -140,8 +142,9 @@ public class Entita implements Runnable {
                     nMessages = 0;
 //                    System.out.println(name() + " - TIMEOUT - found " + best[2]);
                     sources = sources - CHILD_EXPENSE;
-                    Entita child = new Entita(postOffice, 0, (talent + d(best[1])) / 2);
+                    Entita child = new Entita(matrika, postOffice, 0, (talent + d(best[1])) / 2);
                     postOffice.notifyTo(best[2], YOU_ARE_DAD.value, s(talent), s(sources), name());
+                    matrika.oznamPodatelne(name(), new String[]{WE_HAVE_A_BABY.value, best[2]});
                     timeStopWatch = 0;
                     potentialPartners.clear();
                     System.out.println("We did IT!!!! mother: " + this.name() + ", father: " + best[2] + ", new born: " + child.name());
@@ -170,10 +173,10 @@ public class Entita implements Runnable {
 
                 if (message[0].equals(LOOKING_FOR_PARTNER.value)) {
                     //odpovidam yes partner (nebo mlcim a ignoruji)
-                    postOffice.notifyTo(message[3], YES_PARTNER.value, s(talent), s(sources), name());
+                    postOffice.notifyTo(message[3], CONFIRM_PARTNER.value, s(talent), s(sources), name());
 //                    System.out.println(name() + " Processing - LOOKING_FOR_PARTNER");
                 }
-                if (message[0].equals(YES_PARTNER.value)) {
+                if (message[0].equals(CONFIRM_PARTNER.value)) {
                     potentialPartners.add(new String[]{message[1], message[2], message[3]});
 //                    System.out.println(" Processing - YES_PARTNER : Entity " + name() + " accepting " + message[3] + " as a partner...");
                 }

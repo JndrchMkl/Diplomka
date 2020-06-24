@@ -2,12 +2,16 @@ package messeges2;
 
 public enum MessageType {
     LOOKING_FOR_PARTNER("1"),
-    YOU_ARE_DAD("2"),
-    GIVE_SOURCE("3"),
-    WANT_STEAL("4"),
-    WANT_KILL("5"),
-    YES_PARTNER("6"),
-    ;
+    CONFIRM_PARTNER("2"),
+    YOU_ARE_DAD("3"),
+    GIVE_SOURCE("4"),
+
+    WANT_STEAL("5"),
+    WANT_KILL("6"),
+
+    WE_HAVE_A_BABY("7"),
+    I_DIED("8");
+
 
     public final String value;
 
