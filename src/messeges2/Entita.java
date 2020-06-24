@@ -8,6 +8,8 @@ import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static messeges2.MessageType.*;
+import static messeges2.StringUtils.d;
+import static messeges2.StringUtils.s;
 import static messeges2.TimeUtils.systemNanoTime;
 
 public class Entita implements Runnable {
@@ -45,7 +47,7 @@ public class Entita implements Runnable {
         this.talent = talent;
         this.postOffice = postOffice;
         this.timestampPresent = timeNow(); //actual time zero
-        this.timestampEnd = timestampPresent + (1000000000 * ThreadLocalRandom.current().nextDouble(5.0, 95.0));
+        this.timestampEnd = timestampPresent + (1000000000 * ThreadLocalRandom.current().nextDouble(50.0, 115.0));
 //        this.timestampEnd = timestampPresent * 2;
         this.isAlive = true;
         this.intentLookForYourNewPartner = false;
@@ -89,12 +91,12 @@ public class Entita implements Runnable {
 
 
             // zemri starim (nebo hladověním)
-//            if (timestampPresent > timestampEnd) {
-//                die();
-//                postOffice.removeMailbox(name());
-//                System.out.println("SMRT!!! " + name());
-//                return;
-//            }
+            if (timestampPresent > timestampEnd) {
+                die();
+                postOffice.removeMailbox(name());
+                System.out.println("SMRT!!! " + name());
+                return;
+            }
 
             // income
             messages.addAll(postOffice.withdrawMessages(name()));
@@ -108,7 +110,7 @@ public class Entita implements Runnable {
                 // option 1 - notify every single entity
                 // option 2 - notify all entities, but tell them requirements on parameters - NOVA ZPRAVA LOOKING_FOR_PARTNER_WITH_PARAMETERS
                 // option 3 - notify entity directly - našel jsem si partnera a už nechci žádného jiného...
-                postOffice.notifyAll(name(), new String[]{LOOKING_FOR_PARTNER.value, "" + talent, "" + sources, name()});
+                postOffice.notifyAll(name(), LOOKING_FOR_PARTNER.value, s(talent), s(sources), name());
 //                System.out.println(name() + " notifying all - LOOKING_FOR_PARTNER");
 
                 if (timeout == 0) {
@@ -138,8 +140,8 @@ public class Entita implements Runnable {
                     nMessages = 0;
 //                    System.out.println(name() + " - TIMEOUT - found " + best[2]);
                     sources = sources - CHILD_EXPENSE;
-                    Entita child = new Entita(postOffice, 0, (talent + Double.parseDouble(best[1])) / 2);
-                    postOffice.notifyTo(best[2], new String[]{YOU_ARE_DAD.value, "" + talent, "" + sources, name()});
+                    Entita child = new Entita(postOffice, 0, (talent + d(best[1])) / 2);
+                    postOffice.notifyTo(best[2], YOU_ARE_DAD.value, s(talent), s(sources), name());
                     timeStopWatch = 0;
                     potentialPartners.clear();
                     System.out.println("We did IT!!!! mother: " + this.name() + ", father: " + best[2] + ", new born: " + child.name());
@@ -168,7 +170,7 @@ public class Entita implements Runnable {
 
                 if (message[0].equals(LOOKING_FOR_PARTNER.value)) {
                     //odpovidam yes partner (nebo mlcim a ignoruji)
-                    postOffice.notifyTo(message[3], new String[]{YES_PARTNER.value, "" + talent, "" + sources, name()});
+                    postOffice.notifyTo(message[3], YES_PARTNER.value, s(talent), s(sources), name());
 //                    System.out.println(name() + " Processing - LOOKING_FOR_PARTNER");
                 }
                 if (message[0].equals(YES_PARTNER.value)) {
@@ -178,23 +180,25 @@ public class Entita implements Runnable {
                 if (message[0].equals(YOU_ARE_DAD.value)) {
                     if (sources > CHILD_EXPENSE) {
                         sources -= CHILD_EXPENSE;
-                        postOffice.notifyTo(message[3], new String[]{GIVE_SOURCE.value, "" + CHILD_EXPENSE});
+                        postOffice.notifyTo(message[3], GIVE_SOURCE.value, s(CHILD_EXPENSE));
+                    } else {
+                        System.out.println(" Im out of sources!!!!");
                     }
 //                    System.out.println(name() + " Processing - YOU_ARE_DAD");
                 }
                 if (message[0].equals(GIVE_SOURCE.value)) {
-                    double gift = Double.parseDouble(message[1]);
+                    double gift = d(message[1]);
                     sources = sources + gift;
 //                    System.out.println(name() + " Processing - GIVE_SOURCE");
                 }
 //                if (message[0].equals(WANT_STEAL.value)) {
-//                    if (perception < Float.parseFloat(message[2])) {
+//                    if (perception < d(message[2])) {
 //                        postOffice.notifyTo(message[1], GIVE_SOURCE.value + COMMA + sources);
 //                        sources = 0;
 //                    }
 //                }
 //                if (message[0].contains(WANT_KILL.value)) {
-//                    if (strength < Float.parseFloat(message[2])) {
+//                    if (strength < d(message[2])) {
 //                        postOffice.notifyTo(message[1], GIVE_SOURCE.value + COMMA + sources);
 //                        sources = 0;
 //                        this.die();

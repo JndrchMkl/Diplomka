@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class PostOffice {
     ConcurrentHashMap<String, ConcurrentLinkedQueue<String[]>> postOffice = new ConcurrentHashMap<>();
 
-    void notifyTo(String owner, String[] message) {
+    void notifyTo(String owner, String... message) {
         Queue<String[]> inbox = inbox(owner);
         if (inbox != null) {
             inbox(owner).add(message);
@@ -29,7 +29,7 @@ public class PostOffice {
         }
     }
 
-    void notifyAll(String sender, String[] message) {
+    void notifyAll(String sender, String... message) {
         for (String owner : postOffice.keySet()) {
             if (!owner.equals(sender))
                 notifyTo(owner, message);
