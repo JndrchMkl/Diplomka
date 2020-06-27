@@ -63,7 +63,7 @@ public class Entita implements Runnable {
         intervalList = new LinkedList<>();
         thread = new Thread(this);
         postOffice.createMailbox(name());
-        matrika.createChroniqueRecord(name());
+        matrika.createNewRecord(name());
         thread.start();
     }
 
@@ -93,9 +93,10 @@ public class Entita implements Runnable {
 
 
             // zemri starim (nebo hladověním)
-            if (timestampPresent > timestampEnd) {
+            if (timestampPresent > timestampEnd || sources < 0) {
                 die();
                 postOffice.removeMailbox(name());
+                matrika.removeRecord(name());
                 System.out.println("SMRT!!! " + name());
                 return;
             }
@@ -117,7 +118,8 @@ public class Entita implements Runnable {
 
                 if (timeout == 0) {
                     // set time stamp, when entity will must decide
-                    timeout = (calculateAverage(intervalList) * patience);
+                    timeout = (9000 * patience);
+//                    timeout = (calculateAverage(intervalList) * patience);
                 }
 
             }
@@ -132,22 +134,22 @@ public class Entita implements Runnable {
 
 //                System.out.println(name() + " - TIMEOUT");
                 for (String[] data : potentialPartners) {
-                    if (data[0].compareTo(mostTalented) > 0) { // TODO faster way to compare talents, without parsing
+                    if (data[0].compareTo(mostTalented) > 0) {
                         mostTalented = data[0];
                         best = data;
                     }
                 }
                 if (best != null) {
-                    System.out.println("nMessages: " + nMessages);
+//                    System.out.println("nMessages be: " + nMessages);
                     nMessages = 0;
 //                    System.out.println(name() + " - TIMEOUT - found " + best[2]);
                     sources = sources - CHILD_EXPENSE;
                     Entita child = new Entita(matrika, postOffice, 0, (talent + d(best[1])) / 2);
                     postOffice.notifyTo(best[2], YOU_ARE_DAD.value, s(talent), s(sources), name());
-                    matrika.oznamPodatelne(name(), new String[]{WE_HAVE_A_BABY.value, best[2]});
+                    matrika.oznamPodatelne(name(), new String[]{WE_HAVE_A_BABY.value, child.name(), best[2]});
                     timeStopWatch = 0;
                     potentialPartners.clear();
-                    System.out.println("We did IT!!!! mother: " + this.name() + ", father: " + best[2] + ", new born: " + child.name());
+//                    System.out.println("We did IT!!!! mother: " + this.name() + ", father: " + best[2] + ", new born: " + child.name());
                 }
             }
             // 03 - Process the intent
