@@ -16,7 +16,9 @@ import static messeges2.TimeUtils.systemSecondsTime;
 public class GraphMain {
 
     public static void main(String[] args) throws Exception {
-        new GraphSizePerTime().run();
+        Thread gui = new Thread(new GraphSizePerTime());
+        gui.setPriority(1);
+        gui.start();
     }
 
 

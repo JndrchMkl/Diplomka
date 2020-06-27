@@ -48,7 +48,7 @@ public class Entita implements Runnable {
         this.postOffice = postOffice;
         this.matrika = matrika;
         this.timestampPresent = timeNow(); //actual time zero
-        this.timestampEnd = timestampPresent + (1000000000 * ThreadLocalRandom.current().nextDouble(50.0, 115.0));
+        this.timestampEnd = timestampPresent + (100000000 * ThreadLocalRandom.current().nextDouble(50.0, 85.0));
 //        this.timestampEnd = timestampPresent * 2;
         this.isAlive = true;
         this.intentLookForYourNewPartner = false;
