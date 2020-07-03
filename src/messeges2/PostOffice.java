@@ -12,13 +12,13 @@ public class PostOffice {
     void notifyTo(String owner, String... message) {
         Queue<String[]> inbox = inbox(owner);
         if (inbox != null) {
-            inbox(owner).add(message);
+            inbox.add(message);
         }
     }
 
-    void notifyRandom(String[] message) {
+    void notifyRandom(String... message) {
         int i = 0;
-        int index = ThreadLocalRandom.current().nextInt(0, postOffice.keySet().size() - 1);
+        int index = ThreadLocalRandom.current().nextInt(0, postOffice.keySet().size());
 
         for (String owner : postOffice.keySet()) {
             if (i == index) {

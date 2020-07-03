@@ -29,13 +29,13 @@ public class Entita implements Runnable {
     private Queue<String[]> potentialPartners;
     private List<Double> intervalList;
     private boolean isAlive;
+    private boolean isLookingForPartner;
     private boolean intentLookForYourNewPartner;
     private boolean intentDecideWhoIsPartnerRightNow;
     private boolean intentSteal;
     private boolean intentMurder;
     private Thread thread;
     private int nTicks = 0;
-    private int nMessages = 0;
 
     //    protected final int CHILD_EXPENSE = 1000000;
     protected final int CHILD_EXPENSE = 1;
@@ -49,8 +49,8 @@ public class Entita implements Runnable {
         this.matrika = matrika;
         this.timestampPresent = timeNow(); //actual time zero
         this.timestampEnd = timestampPresent + (100000000 * ThreadLocalRandom.current().nextDouble(50.0, 85.0));
-//        this.timestampEnd = timestampPresent * 2;
         this.isAlive = true;
+        this.isLookingForPartner = true;
         this.intentLookForYourNewPartner = false;
         this.intentDecideWhoIsPartnerRightNow = false;
         this.intentSteal = false;
@@ -81,6 +81,9 @@ public class Entita implements Runnable {
     @Override
     public void run() {
 //        System.out.println("Hello I am new " + name() + ", " + talent + ", " + patience);
+//        this.timestampPresent = timeNow(); //actual time zero
+//        this.timestampEnd = timestampPresent + (100000000 * ThreadLocalRandom.current().nextDouble(50.0, 85.0));
+
         while (isAlive) {
             /// Phase 1 - upkeep
             // timestamps
@@ -105,7 +108,6 @@ public class Entita implements Runnable {
             messages.addAll(postOffice.withdrawMessages(name()));
             salary(interval);
             liveCosts(interval);
-            nMessages += messages.size();
 
             // Intents
             // 01 - Process the intent
@@ -121,7 +123,7 @@ public class Entita implements Runnable {
                     timeout = (9000 * patience);
 //                    timeout = (calculateAverage(intervalList) * patience);
                 }
-
+                isLookingForPartner = false;
             }
             // 02 - Process the intent
             if (intentDecideWhoIsPartnerRightNow) {
@@ -132,7 +134,6 @@ public class Entita implements Runnable {
                 String mostTalented = "0.0";
                 String[] best = null;
 
-//                System.out.println(name() + " - TIMEOUT");
                 for (String[] data : potentialPartners) {
                     if (data[0].compareTo(mostTalented) > 0) {
                         mostTalented = data[0];
@@ -140,33 +141,34 @@ public class Entita implements Runnable {
                     }
                 }
                 if (best != null) {
-//                    System.out.println("nMessages be: " + nMessages);
-                    nMessages = 0;
-//                    System.out.println(name() + " - TIMEOUT - found " + best[2]);
+//                    System.out.println(name()+" has make a child for nTicks: "+nTicks);
+
                     sources = sources - CHILD_EXPENSE;
                     Entita child = new Entita(matrika, postOffice, 0, (talent + d(best[1])) / 2);
                     postOffice.notifyTo(best[2], YOU_ARE_DAD.value, s(talent), s(sources), name());
                     matrika.oznamPodatelne(name(), new String[]{WE_HAVE_A_BABY.value, child.name(), best[2]});
                     timeStopWatch = 0;
+                    nTicks = 0;
+                    isLookingForPartner = true;
                     potentialPartners.clear();
 //                    System.out.println("We did IT!!!! mother: " + this.name() + ", father: " + best[2] + ", new born: " + child.name());
                 }
             }
             // 03 - Process the intent
-//            if (intentSteal) {
-//                postOffice.notifyRandom(WANT_STEAL.value + COMMA + name() + COMMA + perception);
-//            }
-//            // 04 - Process the intent
-//            if (intentMurder) {
-//                postOffice.notifyRandom(WANT_KILL.value + COMMA + name() + COMMA + strength);
-//            }
+            if (intentSteal) {
+                postOffice.notifyRandom(WANT_STEAL.value, name(), s(perception));
+            }
+            // 04 - Process the intent
+            if (intentMurder) {
+                postOffice.notifyRandom(WANT_KILL.value, name(), s(strength));
+            }
 
 
             // Decide about your intent / Choose your intent
-            intentLookForYourNewPartner = sources > CHILD_EXPENSE;
+            intentLookForYourNewPartner = sources > CHILD_EXPENSE && isLookingForPartner;
             intentDecideWhoIsPartnerRightNow = timeStopWatch > timeout;
-//            intentSteal = timeStopWatch > 15;
-//            intentMurder = timeStopWatch > 20;
+            intentSteal = timeStopWatch > ((calculateAverage(intervalList) * patience) * 10) && perception > strength;
+            intentMurder = timeStopWatch < 0;
 
 
             /// Phase 2 - process messages
@@ -196,24 +198,25 @@ public class Entita implements Runnable {
                     sources = sources + gift;
 //                    System.out.println(name() + " Processing - GIVE_SOURCE");
                 }
-//                if (message[0].equals(WANT_STEAL.value)) {
-//                    if (perception < d(message[2])) {
-//                        postOffice.notifyTo(message[1], GIVE_SOURCE.value + COMMA + sources);
-//                        sources = 0;
-//                    }
-//                }
-//                if (message[0].contains(WANT_KILL.value)) {
-//                    if (strength < d(message[2])) {
-//                        postOffice.notifyTo(message[1], GIVE_SOURCE.value + COMMA + sources);
-//                        sources = 0;
-//                        this.die();
-//                    }
-//
-//                }
+                if (message[0].equals(WANT_STEAL.value)) {
+                    if (perception < d(message[2])) {
+                        postOffice.notifyTo(message[1], GIVE_SOURCE.value, s(sources));
+                        sources = 0;
+                    }
+                }
+                if (message[0].contains(WANT_KILL.value)) {
+                    if (strength < d(message[2])) {
+                        postOffice.notifyTo(message[1], GIVE_SOURCE.value, s(sources));
+                        sources = 0;
+                        this.die();
+                    }
+
+                }
             }
 
 
         }
+        System.out.println("Its not fair! I has been murdered :/");
     }
 
     private double timeNow() {
