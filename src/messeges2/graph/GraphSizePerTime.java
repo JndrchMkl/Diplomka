@@ -3,13 +3,18 @@ package messeges2.graph;
 import messeges2.Entita;
 import messeges2.Matrika;
 import messeges2.PostOffice;
+import messeges2.Settings;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChart;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static messeges2.MessageType.WE_HAVE_A_BABY;
+import static messeges2.StringUtils.d;
 
 public class GraphSizePerTime implements Runnable {
 
@@ -29,6 +34,7 @@ public class GraphSizePerTime implements Runnable {
         double[][] initdata = new double[2][1];
         List<Double> times = new LinkedList<>();
         List<Integer> nEntities = new LinkedList<>();
+        int nRecords = 0;
 
 
         initdata[0] = new double[]{0};
@@ -64,7 +70,7 @@ public class GraphSizePerTime implements Runnable {
 
     void startSimulation() {
         for (int i = 0; i < 2; i++) {
-            Double talent = ThreadLocalRandom.current().nextDouble(1.0, 10.0 + 1);
+            Double talent = ThreadLocalRandom.current().nextDouble(Settings.RANGE_TALENT_FROM, Settings.RANGE_TALENT_TO + 1);
             new Entita(matrika, postOffice, 0.0, talent);
         }
     }

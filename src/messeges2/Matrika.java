@@ -2,10 +2,8 @@ package messeges2;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import static messeges2.MessageType.I_DIED;
-import static messeges2.MessageType.WE_HAVE_A_BABY;
 
 public class Matrika implements Runnable {
     boolean isRunning = true;

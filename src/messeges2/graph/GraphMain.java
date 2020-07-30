@@ -17,7 +17,7 @@ public class GraphMain {
 
     public static void main(String[] args) throws Exception {
         Thread gui = new Thread(new GraphSizePerTime());
-        gui.setPriority(1);
+//        gui.setPriority(1);
         gui.start();
     }
 
