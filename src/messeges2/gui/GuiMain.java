@@ -1,18 +1,20 @@
 package messeges2.gui;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import messeges2.Settings;
+import messeges2.graph.GraphMain;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,6 +55,10 @@ public class GuiMain extends Application {
     @FXML
     private ListView<ListItemIntent> listViewIntents;
 
+    // Run Simulation buttons
+    @FXML
+    private Button buttonSizePerTime;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -85,6 +91,16 @@ public class GuiMain extends Application {
         initSpinner(spinnerSizeEntitySet, Settings.SIZE_ENTITY_SET, 1, 1);
 
         initCheckList();
+
+        buttonSizePerTime.setOnAction(event-> {
+            try {
+                setActualConfiguration();
+                GraphMain.main(null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        });
     }
 
     private void initCheckList() {
@@ -100,14 +116,39 @@ public class GuiMain extends Application {
                 return new ListItemIntent(string);
             }
         }));
+        Callback<ListView<ListItemIntent>, ListCell<ListItemIntent>> wrappedCellFactory = listViewIntents.getCellFactory();
+        listViewIntents.setCellFactory(listView -> {
+                    CheckBoxListCell<ListItemIntent> cell = wrappedCellFactory != null ? (CheckBoxListCell<ListItemIntent>) wrappedCellFactory.call(listView) : new CheckBoxListCell<>();
+                    cell.setSelectedStateCallback(ListItemIntent::selectedProperty);
+
+                    Platform.runLater(() -> {
+                        if (cell.getItem() != null)
+                            cell.setDisable(cell.getItem().isDisabled());
+                    });
+
+                    cell.itemProperty().addListener(new ChangeListener<ListItemIntent>() {
+                        @Override
+                        public void changed(ObservableValue<? extends ListItemIntent> observable, ListItemIntent oldValue, ListItemIntent newValue) {
+                            // I cannot modify here the checkbox cell...
+                        }
+
+                    });
+
+
+                    return cell;
+                }
+        );
+
         listViewIntents.setOnMouseClicked(event -> {
             ListItemIntent selectedItem = listViewIntents.getSelectionModel().getSelectedItem();
-            selectedItem.setSelected(!selectedItem.selectedProperty().get());
+            if (selectedItem != null)
+                selectedItem.setSelected(!selectedItem.selectedProperty().get());
         });
 
-       listViewIntents.getItems().add(new ListItemIntent("Item 1"));
-       listViewIntents.getItems().add(new ListItemIntent("Item 2"));
-       listViewIntents.getItems().add(new ListItemIntent("Item 3"));
+        listViewIntents.getItems().add(new ListItemIntent("intentLookForYourNewPartner", true));
+        listViewIntents.getItems().add(new ListItemIntent("intentDecideWhoIsPartnerRightNow", true));
+        listViewIntents.getItems().add(new ListItemIntent("intentSteal"));
+        listViewIntents.getItems().add(new ListItemIntent("intentMurder"));
     }
 
     private void initSpinner(Spinner<Double> spinner, double value, int incrementStep, int decrementStep) {
@@ -133,7 +174,7 @@ public class GuiMain extends Application {
                 case UP:
                     spinner.increment(incrementStep);
                     actualValue.set(spinner.getValue());
-                    System.out.println("---"+actualValue.toString());
+                    System.out.println("---" + actualValue.toString());
                     break;
                 case DOWN:
                     spinner.decrement(decrementStep);
@@ -142,5 +183,27 @@ public class GuiMain extends Application {
         });
         spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1000000));
         spinner.getValueFactory().setValue(value);
+    }
+
+    private void setActualConfiguration() {
+        Settings.RANGE_TALENT_FROM = spinnerTalentFrom.getValue();
+        Settings.RANGE_TALENT_TO = spinnerTalentTo.getValue();
+        Settings.RANGE_PATIENCE_FROM = spinnerPatienceFrom.getValue();
+        Settings.RANGE_PATIENCE_TO = spinnerPatienceTo.getValue();
+        Settings.RANGE_STRENGTH_FROM = spinnerStrengthFrom.getValue();
+        Settings.RANGE_STRENGTH_TO = spinnerStrengthTo.getValue();
+        Settings.RANGE_PERCEPTION_FROM = spinnerPerceptionFrom.getValue();
+        Settings.RANGE_PERCEPTION_TO = spinnerPerceptionTo.getValue();
+        Settings.RANGE_LIFE_LENGTH_FROM = spinnerRangeLifeLengthFrom.getValue();
+        Settings.RANGE_LIFE_LENGTH_TO = spinnerRangeLifeLengthTo.getValue();
+        Settings.MULTIPLIER_LIVE_COST = spinnerMultiplierLiveCost.getValue();
+        Settings.MULTIPLIER_INCOME = spinnerMultiplierIncome.getValue();
+        Settings.VALUE_CHILD_EXPENSE = spinnerChildExpense.getValue();
+        Settings.SIZE_ENTITY_SET = spinnerSizeEntitySet.getValue();
+
+       Settings.INTENT_LOOK_FOR_PARTNER= listViewIntents.getItems().get(0).isSelected();
+       Settings.INTENT_DECIDE_RIGHT_NOW= listViewIntents.getItems().get(1).isSelected();
+       Settings.INTENT_STEAL= listViewIntents.getItems().get(2).isSelected();
+       Settings.INTENT_MURDER= listViewIntents.getItems().get(3).isSelected();
     }
 }

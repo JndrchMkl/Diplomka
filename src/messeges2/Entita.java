@@ -84,10 +84,17 @@ public class Entita implements Runnable {
     @Override
     public void run() {
 //        System.out.println("Hello I am new " + name() + ", " + talent + ", " + patience);
+        try {
+            Thread.sleep(333); // TODO remove this after improving graph drawing
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         this.timestampPresent = timestampBorn; //actual time zero
         this.timestampEnd = timestampPresent +
-                (Settings.MULTIPLIER_LIVE_LENGTH * ThreadLocalRandom.current().nextDouble(Settings.RANGE_LIFE_LENGTH_FROM,
-                        Settings.RANGE_LIFE_LENGTH_TO));
+                (Settings.MULTIPLIER_LIVE_LENGTH *
+                        ThreadLocalRandom.current().nextDouble(Settings.RANGE_LIFE_LENGTH_FROM,
+                        Settings.RANGE_LIFE_LENGTH_TO)
+                );
 
         while (isAlive) {
             /// Phase 1 - upkeep
@@ -113,8 +120,8 @@ public class Entita implements Runnable {
                     //s.addBatch(s1);
                     //s.addBatch(s2);
                     //s.executeBatch();
-                    FileWriting<Double> fw = new FileWriting<>( (name()));
-                    fw.writeBuffered(intervalList, 8192);
+//                    FileWriting<Double> fw = new FileWriting<>( (name()));
+//                    fw.writeBuffered(intervalList, 8192);
                 }
                 System.out.println("SMRT!!! " + name());
                 return;
@@ -184,10 +191,10 @@ public class Entita implements Runnable {
 
 
             // Decide about your intent / Choose your intent
-            intentLookForYourNewPartner = sources > Settings.VALUE_CHILD_EXPENSE && isLookingForPartner;
-            intentDecideWhoIsPartnerRightNow = timeStopWatch > timeout;
-            intentSteal = timeStopWatch > ((calculateAverage(intervalList) * patience) * 10) && perception > strength;
-            intentMurder = timeStopWatch < 0;
+            intentLookForYourNewPartner = sources > Settings.VALUE_CHILD_EXPENSE && isLookingForPartner && Settings.INTENT_LOOK_FOR_PARTNER;
+            intentDecideWhoIsPartnerRightNow = timeStopWatch > timeout && Settings.INTENT_DECIDE_RIGHT_NOW;
+            intentSteal = timeStopWatch > ((calculateAverage(intervalList) * patience) * 10) && perception > strength && Settings.INTENT_STEAL;
+            intentMurder = timeStopWatch < 0 && Settings.INTENT_MURDER;
 
 
             /// Phase 2 - process messages

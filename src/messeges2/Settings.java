@@ -1,6 +1,10 @@
 package messeges2;
 
 public class Settings {
+    public static boolean INTENT_LOOK_FOR_PARTNER = true;
+    public static boolean INTENT_DECIDE_RIGHT_NOW = true;
+    public static boolean INTENT_STEAL = true;
+    public static boolean INTENT_MURDER = true;
     public static int MULTIPLIER_LIVE_COST = 5;
     public static int MULTIPLIER_INCOME = 1;
     public static int MULTIPLIER_TIMEOUT_INTENT_LOOK_FOR_PARTNER = 9000;

@@ -8,9 +8,15 @@ import javafx.beans.property.SimpleBooleanProperty;
 public class ListItemIntent {
     private final ReadOnlyStringWrapper name = new ReadOnlyStringWrapper();
     private final BooleanProperty selected = new SimpleBooleanProperty(true);
+    private boolean disabled;
 
     public ListItemIntent(String name) {
         this.name.set(name);
+        disabled = false;
+    }
+    public ListItemIntent(String name,boolean disabled) {
+        this.name.set(name);
+        this.disabled = disabled;
     }
 
     public String getName() {
@@ -30,7 +36,13 @@ public class ListItemIntent {
     }
 
     public void setSelected(boolean selected) {
-        this.selected.set(selected);
+        if (!disabled) {
+            this.selected.set(selected);
+        }
+    }
+
+    public boolean isDisabled() {
+        return disabled;
     }
 
     @Override
