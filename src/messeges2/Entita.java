@@ -1,6 +1,8 @@
 package messeges2;
 
 
+import messeges2.db.MysqlConnector;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -41,9 +43,7 @@ public class Entita implements Runnable {
     private Thread thread;
     private int nTicks = 0;
 
-    //    protected final int CHILD_EXPENSE = 1000000;
-    protected final int CHILD_EXPENSE = 1;
-    protected final String COMMA = ",";
+//    protected final int CHILD_EXPENSE = 1;
     private double timeStopWatch = 0;
 
     public Entita(Matrika matrika, PostOffice postOffice, double sources, double talent) {
@@ -51,8 +51,6 @@ public class Entita implements Runnable {
         this.talent = talent;
         this.postOffice = postOffice;
         this.matrika = matrika;
-//        this.timestampPresent = timeNow(); //actual time zero
-//        this.timestampEnd = timestampPresent + (100000000 * ThreadLocalRandom.current().nextDouble(50.0, 85.0));
         this.isAlive = true;
         this.isLookingForPartner = true;
         this.intentLookForYourNewPartner = false;
@@ -87,12 +85,10 @@ public class Entita implements Runnable {
     public void run() {
 //        System.out.println("Hello I am new " + name() + ", " + talent + ", " + patience);
         this.timestampPresent = timestampBorn; //actual time zero
-        this.timestampEnd = timestampPresent + (Settings.MULTIPLIER_LIVE_LENGTH * ThreadLocalRandom.current().nextDouble(Settings.RANGE_LIFE_LENGTH_FROM, Settings.RANGE_LIFE_LENGTH_TO));
-        try {
-            Thread.sleep(0, 100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        this.timestampEnd = timestampPresent +
+                (Settings.MULTIPLIER_LIVE_LENGTH * ThreadLocalRandom.current().nextDouble(Settings.RANGE_LIFE_LENGTH_FROM,
+                        Settings.RANGE_LIFE_LENGTH_TO));
+
         while (isAlive) {
             /// Phase 1 - upkeep
             // timestamps
@@ -110,7 +106,14 @@ public class Entita implements Runnable {
                 postOffice.removeMailbox(name());
                 matrika.removeRecord(name());
                 if (hasRecord) {
-                    FileWriting<Double> fw = new FileWriting<>("/intervals/", (name()));
+                    // TODO vlozeni zaznamu do databaze
+                    // Statement s = c.createStatement();
+                    //String s1 = "update emp set name='abc' where salary=984";
+                    //String s2 = "insert into emp values ('Osama',1420)";
+                    //s.addBatch(s1);
+                    //s.addBatch(s2);
+                    //s.executeBatch();
+                    FileWriting<Double> fw = new FileWriting<>( (name()));
                     fw.writeBuffered(intervalList, 8192);
                 }
                 System.out.println("SMRT!!! " + name());
@@ -159,7 +162,7 @@ public class Entita implements Runnable {
                 if (best != null) {
 //                    System.out.println(name()+" has make a child for nTicks: "+nTicks);
 
-                    sources = sources - CHILD_EXPENSE;
+                    sources = sources - Settings.VALUE_CHILD_EXPENSE;
                     Entita child = new Entita(matrika, postOffice, 0, (talent + d(best[1])) / 2);
                     postOffice.notifyTo(best[2], YOU_ARE_DAD.value, s(talent), s(sources), name());
                     matrika.oznamPodatelne(name(), new String[]{WE_HAVE_A_BABY.value, child.name(), s(child.getTimestampBorn()), best[2]});
@@ -181,7 +184,7 @@ public class Entita implements Runnable {
 
 
             // Decide about your intent / Choose your intent
-            intentLookForYourNewPartner = sources > CHILD_EXPENSE && isLookingForPartner;
+            intentLookForYourNewPartner = sources > Settings.VALUE_CHILD_EXPENSE && isLookingForPartner;
             intentDecideWhoIsPartnerRightNow = timeStopWatch > timeout;
             intentSteal = timeStopWatch > ((calculateAverage(intervalList) * patience) * 10) && perception > strength;
             intentMurder = timeStopWatch < 0;
@@ -201,9 +204,9 @@ public class Entita implements Runnable {
 //                    System.out.println(" Processing - YES_PARTNER : Entity " + name() + " accepting " + message[3] + " as a partner...");
                 }
                 if (message[0].equals(YOU_ARE_DAD.value)) {
-                    if (sources > CHILD_EXPENSE) {
-                        sources -= CHILD_EXPENSE;
-                        postOffice.notifyTo(message[3], GIVE_SOURCE.value, s(CHILD_EXPENSE));
+                    if (sources > Settings.VALUE_CHILD_EXPENSE) {
+                        sources -= Settings.VALUE_CHILD_EXPENSE;
+                        postOffice.notifyTo(message[3], GIVE_SOURCE.value, s(Settings.VALUE_CHILD_EXPENSE));
                     } else {
                         System.out.println(" Im out of sources!!!!");
                     }

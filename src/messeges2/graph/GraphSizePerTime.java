@@ -10,11 +10,7 @@ import org.knowm.xchart.XYChart;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
-
-import static messeges2.MessageType.WE_HAVE_A_BABY;
-import static messeges2.StringUtils.d;
 
 public class GraphSizePerTime implements Runnable {
 
@@ -69,8 +65,8 @@ public class GraphSizePerTime implements Runnable {
     }
 
     void startSimulation() {
-        for (int i = 0; i < 2; i++) {
-            Double talent = ThreadLocalRandom.current().nextDouble(Settings.RANGE_TALENT_FROM, Settings.RANGE_TALENT_TO + 1);
+        for (int i = 0; i < Settings.SIZE_ENTITY_SET; i++) {
+            Double talent = ThreadLocalRandom.current().nextDouble(Settings.RANGE_TALENT_FROM, Settings.RANGE_TALENT_TO );
             new Entita(matrika, postOffice, 0.0, talent);
         }
     }
