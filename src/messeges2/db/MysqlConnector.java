@@ -2,6 +2,7 @@ package messeges2.db;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import static messeges2.Settings.ACTUAL_ID_BUILD;
 
@@ -36,7 +37,9 @@ public class MysqlConnector {
 
     public int insertBuildRun() throws SQLException {
 //        stmt = conn.createStatement();
-        int actualRunNumber = selectBuildVersion() + 1;
+        ResultSet resultSet = selectBuildVersion();
+        ACTUAL_ID_BUILD = resultSet.getInt(1) + 1;
+        int actualRunNumber = resultSet.getInt(2) + 1;
         String strInsert = "insert into build (Date,Build_version,Run_number) VALUES('"
                 + strDate + "','"
                 + buildVersion + actualRunNumber + "',"
@@ -45,11 +48,27 @@ public class MysqlConnector {
         return actualRunNumber;
     }
 
-    private int selectBuildVersion() throws SQLException {
-        String strInsert = "SELECT id, Run_number from build order by Run_number desc";
+    private ResultSet selectBuildVersion() throws SQLException {
+        String strInsert = "SELECT id, Run_number from build order by run_number DESC, ID DESC";
         ResultSet rs = stmt.executeQuery(strInsert);
         rs.next();
         ACTUAL_ID_BUILD = rs.getInt(1) + 1;
-        return rs.getInt(2);
+        return rs;
+    }
+
+    public void insertEntityRecord(List<Double> intervalList, String name) {
+        try {
+
+            for (Double interval : intervalList) {
+                String strInsert = "insert into entity (name ,tick_duration ,id_build) VALUES('"
+                        + name + "',"
+                        + interval + ","
+                        + ACTUAL_ID_BUILD + ")";
+                stmt.addBatch(strInsert);
+            }
+            stmt.executeBatch();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -3,8 +3,6 @@ package messeges2;
 
 import messeges2.db.MysqlConnector;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -33,7 +31,7 @@ public class Entita implements Runnable {
     private Queue<String[]> messages;
     private Queue<String[]> potentialPartners;
     private List<Double> intervalList;
-    private boolean hasRecord = true;
+    private boolean hasRecord = false;
     private boolean isAlive;
     private boolean isLookingForPartner;
     private boolean intentLookForYourNewPartner;
@@ -43,7 +41,6 @@ public class Entita implements Runnable {
     private Thread thread;
     private int nTicks = 0;
 
-//    protected final int CHILD_EXPENSE = 1;
     private double timeStopWatch = 0;
 
     public Entita(Matrika matrika, PostOffice postOffice, double sources, double talent) {
@@ -83,18 +80,15 @@ public class Entita implements Runnable {
 
     @Override
     public void run() {
-//        System.out.println("Hello I am new " + name() + ", " + talent + ", " + patience);
-        try {
-            Thread.sleep(333); // TODO remove this after improving graph drawing
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        this.timestampPresent = timestampBorn; //actual time zero
-        this.timestampEnd = timestampPresent +
-                (Settings.MULTIPLIER_LIVE_LENGTH *
-                        ThreadLocalRandom.current().nextDouble(Settings.RANGE_LIFE_LENGTH_FROM,
-                        Settings.RANGE_LIFE_LENGTH_TO)
-                );
+        System.out.println("Hello I am new " + name() + ", " + talent + ", " + patience);
+//        try {
+//            Thread.sleep(333); // TODO remove this after improving graph drawing
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        this.timestampPresent = timestampBorn; //actual time zero
+        this.timestampPresent = timeNow(); //actual time zero
+        this.timestampEnd = timestampPresent + (Settings.MULTIPLIER_LIVE_LENGTH * ThreadLocalRandom.current().nextDouble(Settings.RANGE_LIFE_LENGTH_FROM, Settings.RANGE_LIFE_LENGTH_TO));
 
         while (isAlive) {
             /// Phase 1 - upkeep
@@ -103,7 +97,7 @@ public class Entita implements Runnable {
             double interval = now - timestampPresent; // nutno pocitat s intervalem rovnym 0. POZOR!!! Nedělit s intervalem rovným 0!!!
             timestampPresent = now;
             timeStopWatch += interval;
-            intervalList.add(income(interval));
+            intervalList.add((interval));
             nTicks++;
 
 
@@ -114,14 +108,10 @@ public class Entita implements Runnable {
                 matrika.removeRecord(name());
                 if (hasRecord) {
                     // TODO vlozeni zaznamu do databaze
-                    // Statement s = c.createStatement();
-                    //String s1 = "update emp set name='abc' where salary=984";
-                    //String s2 = "insert into emp values ('Osama',1420)";
-                    //s.addBatch(s1);
-                    //s.addBatch(s2);
-                    //s.executeBatch();
-//                    FileWriting<Double> fw = new FileWriting<>( (name()));
-//                    fw.writeBuffered(intervalList, 8192);
+
+                    MysqlConnector.getInstance().insertEntityRecord(intervalList, name());
+
+
                 }
                 System.out.println("SMRT!!! " + name());
                 return;
@@ -174,7 +164,7 @@ public class Entita implements Runnable {
                     postOffice.notifyTo(best[2], YOU_ARE_DAD.value, s(talent), s(sources), name());
                     matrika.oznamPodatelne(name(), new String[]{WE_HAVE_A_BABY.value, child.name(), s(child.getTimestampBorn()), best[2]});
                     timeStopWatch = 0;
-                    nTicks = 0;
+//                    nTicks = 0;
                     isLookingForPartner = true;
                     potentialPartners.clear();
 //                    System.out.println("We did IT!!!! mother: " + this.name() + ", father: " + best[2] + ", new born: " + child.name());
@@ -193,8 +183,8 @@ public class Entita implements Runnable {
             // Decide about your intent / Choose your intent
             intentLookForYourNewPartner = sources > Settings.VALUE_CHILD_EXPENSE && isLookingForPartner && Settings.INTENT_LOOK_FOR_PARTNER;
             intentDecideWhoIsPartnerRightNow = timeStopWatch > timeout && Settings.INTENT_DECIDE_RIGHT_NOW;
-            intentSteal = timeStopWatch > ((calculateAverage(intervalList) * patience) * 10) && perception > strength && Settings.INTENT_STEAL;
-            intentMurder = timeStopWatch < 0 && Settings.INTENT_MURDER;
+//            intentSteal = timeStopWatch > ((calculateAverage(intervalList) * patience) * 10) && perception > strength && Settings.INTENT_STEAL;
+//            intentMurder = timeStopWatch < 0 && Settings.INTENT_MURDER;
 
 
             /// Phase 2 - process messages

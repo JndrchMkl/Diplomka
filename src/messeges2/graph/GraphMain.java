@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class GraphMain {
 
     public static void main(String[] args) throws Exception {
-//        recordBuild();
+        recordBuild();
 
 
         Thread gui = new Thread(new GraphSizePerTime());

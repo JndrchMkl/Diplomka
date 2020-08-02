@@ -23,7 +23,6 @@ public class Settings {
     public static int SIZE_ENTITY_SET = 2;
     public static int VALUE_CHILD_EXPENSE = 1;
 
-    //TODO ID a verze buildu v MySQL DB
-    public static int ACTUAL_ID_BUILD=0;
+    public static int ACTUAL_ID_BUILD=1;
 
 }
