@@ -1,4 +1,4 @@
-package messeges2;
+package messeges2.message;
 
 public enum MessageType {
     LOOKING_FOR_PARTNER("1"),

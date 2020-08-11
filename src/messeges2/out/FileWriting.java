@@ -1,4 +1,4 @@
-package messeges2;
+package messeges2.out;
 
 import java.io.*;
 import java.util.ArrayList;

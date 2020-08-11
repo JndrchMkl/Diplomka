@@ -1,6 +1,5 @@
+package messeges;
 
-import entitytask.Entity;
-import entitytask.SystemCore;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -15,13 +14,15 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.input.ScrollEvent;
 import javafx.stage.Stage;
+import messeges.Entity;
+import messeges.SystemCore;
 
 import java.util.List;
 import java.util.Stack;
 
-import static entitytask.SystemCore.INIT_SET;
+import static messeges.SystemCore.INIT_SET;
 
-public class GUI extends Application {
+public class GUI2 extends Application {
     private final SystemCore sys = SystemCore.getInstance();
 
     @FXML

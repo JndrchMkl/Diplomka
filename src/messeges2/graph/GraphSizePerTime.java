@@ -2,7 +2,7 @@ package messeges2.graph;
 
 import messeges2.Entita;
 import messeges2.Matrika;
-import messeges2.PostOffice;
+import messeges2.message.PostOffice;
 import messeges2.Settings;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.SwingWrapper;
@@ -27,6 +27,7 @@ public class GraphSizePerTime implements Runnable {
     public void run() {
         double timeBegin = System.nanoTime();
         double timeStopWatch = 0;
+        double timeoutStopWatch = 0;
         double[][] initdata = new double[2][1];
         List<Double> times = new LinkedList<>();
         List<Integer> nEntities = new LinkedList<>();
@@ -42,6 +43,7 @@ public class GraphSizePerTime implements Runnable {
         // Show it
         final SwingWrapper<XYChart> sw = new SwingWrapper<>(chart);
         sw.displayChart();
+
         try {
             startSimulation();
 
@@ -49,19 +51,24 @@ public class GraphSizePerTime implements Runnable {
                 double now = System.nanoTime();
                 double interval = now - timeBegin; // nutno pocitat s intervalem rovnym 0. POZOR!!! Nedělit s intervalem rovným 0!!!
                 timeStopWatch += interval;
+                timeoutStopWatch += interval;
                 timeBegin = now;
+
 
                 times.add(timeStopWatch / 1000000000);
                 nEntities.add(matrika.nRecords());
+//                if (timeoutStopWatch > 1000000000) {
 
-                chart.updateXYSeries(SERIES_NAME, times, nEntities, null);
-                sw.repaintChart();
+//                System.out.println("tick"+timeoutStopWatch);
+                    chart.updateXYSeries(SERIES_NAME, times, nEntities, null);
+                    sw.repaintChart();
+                    timeoutStopWatch = 0;
+//                }
                 Thread.sleep(100);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
     void startSimulation() {

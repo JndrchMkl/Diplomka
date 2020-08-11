@@ -2,16 +2,17 @@ package messeges2;
 
 
 import messeges2.db.MysqlConnector;
+import messeges2.message.PostOffice;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static messeges2.MessageType.*;
-import static messeges2.StringUtils.d;
-import static messeges2.StringUtils.s;
-import static messeges2.TimeUtils.systemNanoTime;
+import static messeges2.message.MessageType.*;
+import static messeges2.utils.StringUtils.d;
+import static messeges2.utils.StringUtils.s;
+import static messeges2.utils.TimeUtils.systemNanoTime;
 
 public class Entita implements Runnable {
 
@@ -42,6 +43,7 @@ public class Entita implements Runnable {
     private int nTicks = 0;
 
     private double timeStopWatch = 0;
+    private double moraleMurder = 0;
 
     public Entita(Matrika matrika, PostOffice postOffice, double sources, double talent) {
         this.sources = sources;
@@ -80,15 +82,17 @@ public class Entita implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Hello I am new " + name() + ", " + talent + ", " + patience);
-//        try {
-//            Thread.sleep(333); // TODO remove this after improving graph drawing
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+//        System.out.println("Hello I am new " + name() + ", " + talent + ", " + patience);
+        try {
+            Thread.sleep(100); // TODO remove this after improving graph drawing
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 //        this.timestampPresent = timestampBorn; //actual time zero
-        this.timestampPresent = timeNow(); //actual time zero
+
+                this.timestampPresent = timeNow(); //actual time zero
         this.timestampEnd = timestampPresent + (Settings.MULTIPLIER_LIVE_LENGTH * ThreadLocalRandom.current().nextDouble(Settings.RANGE_LIFE_LENGTH_FROM, Settings.RANGE_LIFE_LENGTH_TO));
+        moraleMurder = (timestampEnd - timestampPresent) / 2;
 
         while (isAlive) {
             /// Phase 1 - upkeep
@@ -107,11 +111,7 @@ public class Entita implements Runnable {
                 postOffice.removeMailbox(name());
                 matrika.removeRecord(name());
                 if (hasRecord) {
-                    // TODO vlozeni zaznamu do databaze
-
                     MysqlConnector.getInstance().insertEntityRecord(intervalList, name());
-
-
                 }
                 System.out.println("SMRT!!! " + name());
                 return;
@@ -183,8 +183,8 @@ public class Entita implements Runnable {
             // Decide about your intent / Choose your intent
             intentLookForYourNewPartner = sources > Settings.VALUE_CHILD_EXPENSE && isLookingForPartner && Settings.INTENT_LOOK_FOR_PARTNER;
             intentDecideWhoIsPartnerRightNow = timeStopWatch > timeout && Settings.INTENT_DECIDE_RIGHT_NOW;
-//            intentSteal = timeStopWatch > ((calculateAverage(intervalList) * patience) * 10) && perception > strength && Settings.INTENT_STEAL;
-//            intentMurder = timeStopWatch < 0 && Settings.INTENT_MURDER;
+            intentSteal = timeStopWatch > ((calculateAverage(intervalList) * patience) * 10) && Settings.INTENT_STEAL;
+            intentMurder = timeStopWatch > moraleMurder && Settings.INTENT_MURDER;
 
 
             /// Phase 2 - process messages
@@ -232,7 +232,7 @@ public class Entita implements Runnable {
 
 
         }
-        System.out.println("Its not fair! I has been murdered :/");
+        System.out.println("Its not fair! I has been murdered :/ "+name());
     }
 
     private double timeNow() {

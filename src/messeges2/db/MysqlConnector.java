@@ -56,7 +56,7 @@ public class MysqlConnector {
         return rs;
     }
 
-    public void insertEntityRecord(List<Double> intervalList, String name) {
+    public synchronized void insertEntityRecord(List<Double> intervalList, String name) {
         try {
 
             for (Double interval : intervalList) {

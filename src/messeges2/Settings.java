@@ -1,6 +1,6 @@
 package messeges2;
 
-public class Settings {
+public abstract class Settings {
     public static boolean INTENT_LOOK_FOR_PARTNER = true;
     public static boolean INTENT_DECIDE_RIGHT_NOW = true;
     public static boolean INTENT_STEAL = true;
@@ -23,6 +23,6 @@ public class Settings {
     public static int SIZE_ENTITY_SET = 2;
     public static int VALUE_CHILD_EXPENSE = 1;
 
-    public static int ACTUAL_ID_BUILD=1;
+    public static int ACTUAL_ID_BUILD = 1;
 
 }

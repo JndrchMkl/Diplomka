@@ -1,10 +1,10 @@
-package messeges2;
+package messeges2.utils;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.time.Instant;
 
-public class TimeUtils extends Thread {
+public final class TimeUtils extends Thread {
 
 
     public static long systemMillisTime() {

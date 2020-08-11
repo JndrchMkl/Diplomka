@@ -1,4 +1,4 @@
-package messeges2;
+package messeges2.utils;
 
 public final class StringUtils {
     public static String s(Double number) {
