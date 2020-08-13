@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="571.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.upa.simulation.gui.GuiMain">
+    <children>
+        <GridPane layoutX="155.0" layoutY="103.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="10.0" prefWidth="449.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="331.0" minWidth="0.0" prefWidth="151.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints maxHeight="455.0" minHeight="10.0" prefHeight="389.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="269.0" minHeight="9.0" prefHeight="182.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <AnchorPane>
+                    <children>
+                        <TitledPane animated="false" prefHeight="380.0" prefWidth="513.0" text="Entity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <GridPane layoutX="49.0" layoutY="9.0" prefHeight="108.0" prefWidth="298.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                            <children>
+                                                <GridPane GridPane.rowIndex="0">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <BorderPane>
+                                                            <center>
+                                                                <BorderPane />
+                                                            </center>
+                                                            <bottom>
+                                                                <Label prefHeight="17.0" prefWidth="400.0" text="Talent" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="1">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="From:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerTalentFrom" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="2">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="To:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerTalentTo" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                    </children>
+                                                </GridPane>
+                                                <GridPane GridPane.rowIndex="1">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <BorderPane>
+                                                            <center>
+                                                                <BorderPane />
+                                                            </center>
+                                                            <bottom>
+                                                                <Label prefHeight="17.0" prefWidth="400.0" text="Patience" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="1">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="From:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerPatienceFrom" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="2">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="To:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerPatienceTo" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                    </children>
+                                                </GridPane>
+                                                <GridPane GridPane.rowIndex="2">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <BorderPane>
+                                                            <center>
+                                                                <BorderPane />
+                                                            </center>
+                                                            <bottom>
+                                                                <Label prefHeight="17.0" prefWidth="400.0" text="Strength" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="1">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="From:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerStrengthFrom" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="2">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="To:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerStrengthTo" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                    </children>
+                                                </GridPane>
+                                                <GridPane GridPane.rowIndex="3">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <BorderPane>
+                                                            <center>
+                                                                <BorderPane />
+                                                            </center>
+                                                            <bottom>
+                                                                <Label prefHeight="17.0" prefWidth="400.0" text="Perception" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="1">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="From:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerPerceptionFrom" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="2">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="To:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerPerceptionTo" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                    </children>
+                                                </GridPane>
+                                                <GridPane GridPane.rowIndex="4">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <BorderPane>
+                                                            <center>
+                                                                <BorderPane />
+                                                            </center>
+                                                            <bottom>
+                                                                <Label prefHeight="17.0" prefWidth="400.0" text="RANGE_LIFE_LENGTH" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="1">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="From:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerRangeLifeLengthFrom" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="2">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="To:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerRangeLifeLengthTo" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                    </children>
+                                                </GridPane>
+                                                <GridPane GridPane.rowIndex="5">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <BorderPane>
+                                                            <center>
+                                                                <BorderPane />
+                                                            </center>
+                                                            <bottom>
+                                                                <Label prefHeight="17.0" prefWidth="400.0" text="MULTIPLIER_LIVE_COST" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="1">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="Value:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerMultiplierLiveCost" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="2">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="To:" visible="false" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerMultiplierLiveCostTo" visible="false" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                    </children>
+                                                </GridPane>
+                                                <GridPane GridPane.rowIndex="6">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <BorderPane>
+                                                            <center>
+                                                                <BorderPane />
+                                                            </center>
+                                                            <bottom>
+                                                                <Label prefHeight="17.0" prefWidth="400.0" text="MULTIPLIER_INCOME" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="1">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="Value:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerMultiplierIncome" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="2">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="To:" visible="false" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerMultiplierIncomeTo" visible="false" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                    </children>
+                                                </GridPane>
+                                                <GridPane GridPane.rowIndex="7">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <BorderPane>
+                                                            <center>
+                                                                <BorderPane />
+                                                            </center>
+                                                            <bottom>
+                                                                <Label prefHeight="17.0" prefWidth="400.0" text="CHILD_EXPENSE" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="1">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="Value:" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner fx:id="spinnerChildExpense" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                        <BorderPane GridPane.columnIndex="2">
+                                                            <top>
+                                                                <Label prefHeight="17.0" prefWidth="300.0" text="To:" visible="false" BorderPane.alignment="CENTER" />
+                                                            </top>
+                                                            <bottom>
+                                                                <Spinner visible="false" BorderPane.alignment="CENTER" />
+                                                            </bottom>
+                                                        </BorderPane>
+                                                    </children>
+                                                </GridPane>
+                                            </children>
+                                        </GridPane>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </TitledPane>
+                    </children>
+                </AnchorPane>
+                <ListView fx:id="listViewIntents" prefHeight="343.0" prefWidth="218.0" GridPane.columnIndex="1" />
+                <AnchorPane GridPane.rowIndex="1">
+                    <children>
+                                        <TitledPane animated="false" prefHeight="380.0" prefWidth="513.0" text="Simulation" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <content>
+                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                    <children>
+                                                        <GridPane layoutX="49.0" layoutY="9.0" prefHeight="108.0" prefWidth="298.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                            <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                            </columnConstraints>
+                                                            <rowConstraints>
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+
+                                                            </rowConstraints>
+                                                            <children>
+                                                                <GridPane GridPane.rowIndex="0">
+                                                                    <columnConstraints>
+                                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                    </columnConstraints>
+                                                                    <rowConstraints>
+                                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                    </rowConstraints>
+                                                                    <children>
+                                                                        <BorderPane>
+                                                                            <center>
+                                                                                <BorderPane />
+                                                                            </center>
+                                                                            <bottom>
+                                                                                <Label prefHeight="17.0" prefWidth="400.0" text="SIZE_ENTITY_SET" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                                                                                    <font>
+                                                                                        <Font name="System Bold" size="12.0" />
+                                                                                    </font>
+                                                                                </Label>
+                                                                            </bottom>
+                                                                        </BorderPane>
+                                                                        <BorderPane GridPane.columnIndex="1">
+                                                                            <top>
+                                                                                <Label prefHeight="17.0" prefWidth="300.0" text="Value:" BorderPane.alignment="CENTER" />
+                                                                            </top>
+                                                                            <bottom>
+                                                                                <Spinner fx:id="spinnerSizeEntitySet" BorderPane.alignment="CENTER" />
+                                                                            </bottom>
+                                                                        </BorderPane>
+                                                                        <BorderPane GridPane.columnIndex="2">
+                                                                            <top>
+                                                                                <Label prefHeight="17.0" prefWidth="300.0" text="To:" visible="false" BorderPane.alignment="CENTER" />
+                                                                            </top>
+                                                                            <bottom>
+                                                                                <Spinner visible="false" BorderPane.alignment="CENTER" />
+                                                                            </bottom>
+                                                                        </BorderPane>
+                                                                    </children>
+                                                                </GridPane>
+
+                                                            </children>
+                                                        </GridPane>
+                                                    </children>
+                                                </AnchorPane>
+                                            </content>
+                                        </TitledPane>
+                                    </children>
+                                </AnchorPane>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <children>
+                  <Button fx:id="buttonSizePerTime" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Pop. size per time" />
+               </children></AnchorPane>
+            </children>
+        </GridPane>
+    </children>
+</AnchorPane>
