@@ -16,26 +16,26 @@ public class FileWriting<T> {
         this.name = name;
     }
 
-//    public static void main(String[] args) throws Exception {
-//        FileWriting<String> fw = new FileWriting<>("kkk");
-//        List<String> records = new ArrayList<>(RECORD_COUNT);
-//        int size = 0;
-//        for (int i = 0; i < RECORD_COUNT; i++) {
-//            records.add(RECORD);
-//            size += RECORD_SIZE;
-//        }
-//        System.out.println(records.size() + " 'records'");
-//        System.out.println(size / MEG + " MB");
-//
-//        for (int i = 0; i < 10; i++) {
-//            System.out.println("\nIteration " + i);
-//
-//            fw.writeRaw(records);
-//            fw.writeBuffered(records, 8192);
-//            fw.writeBuffered(records, (int) MEG);
-//            fw.writeBuffered(records, 4 * (int) MEG);
-//        }
-//    }
+    public static void main(String[] args) throws Exception {
+        FileWriting<String> fw = new FileWriting<>("kkk");
+        List<String> records = new ArrayList<>(RECORD_COUNT);
+        int size = 0;
+        for (int i = 0; i < RECORD_COUNT; i++) {
+            records.add(RECORD);
+            size += RECORD_SIZE;
+        }
+        System.out.println(records.size() + " 'records'");
+        System.out.println(size / MEG + " MB");
+
+        for (int i = 0; i < 10; i++) {
+            System.out.println("\nIteration " + i);
+
+            fw.writeRaw(records);
+            fw.writeBuffered(records, 8192);
+            fw.writeBuffered(records, (int) MEG);
+            fw.writeBuffered(records, 4 * (int) MEG);
+        }
+    }
 
     private void writeRaw(List<T> records) {
         try {

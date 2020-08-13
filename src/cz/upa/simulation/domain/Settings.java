@@ -20,7 +20,7 @@ public abstract class Settings {
     public static double RANGE_TALENT_FROM = 5.0;
     public static double RANGE_TALENT_TO = 10.0;
 
-    public static int SIZE_ENTITY_SET = 2;
+    public static int SIZE_ENTITY_SET = 10;
     public static int VALUE_CHILD_EXPENSE = 1;
 
     public static int ACTUAL_ID_BUILD = 1;

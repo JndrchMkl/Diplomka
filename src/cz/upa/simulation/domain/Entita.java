@@ -1,6 +1,7 @@
 package cz.upa.simulation.domain;
 
 
+import cz.upa.simulation.graph.RecorderSizePerTime;
 import cz.upa.simulation.output.MysqlConnector;
 import cz.upa.simulation.messaging.PostOffice;
 
@@ -109,10 +110,11 @@ public class Entita implements Runnable {
             if (timestampPresent > timestampEnd || sources < 0) {
                 die();
                 postOffice.removeMailbox(name());
-                matrika.removeRecord(name());
-                if (hasRecord) {
-                    MysqlConnector.getInstance().insertEntityRecord(intervalList, name());
-                }
+//                matrika.removeRecord(name());
+                RecorderSizePerTime.recordMessages.add(new Double[]{0.0, timestampPresent});
+//                if (hasRecord) {
+//                    MysqlConnector.getInstance().insertEntityRecord(intervalList, name());
+//                }
                 System.out.println("SMRT!!! " + name());
                 return;
             }
@@ -162,7 +164,9 @@ public class Entita implements Runnable {
                     sources = sources - Settings.VALUE_CHILD_EXPENSE;
                     Entita child = new Entita(matrika, postOffice, 0, (talent + d(best[1])) / 2);
                     postOffice.notifyTo(best[2], YOU_ARE_DAD.value, s(talent), s(sources), name());
-                    matrika.oznamPodatelne(name(), new String[]{WE_HAVE_A_BABY.value, child.name(), s(child.getTimestampBorn()), best[2]});
+//                    matrika.oznamPodatelne(name(), new String[]{WE_HAVE_A_BABY.value, child.name(), s(child.getTimestampBorn()), best[2]});
+                    RecorderSizePerTime.recordMessages.add(new Double[]{1.0, timestampPresent});
+
                     timeStopWatch = 0;
 //                    nTicks = 0;
                     isLookingForPartner = true;
