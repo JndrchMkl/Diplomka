@@ -1,10 +1,10 @@
 package cz.upa.simulation.graph;
 
 import cz.upa.simulation.domain.Entita;
-import cz.upa.simulation.domain.Matrika;
 import cz.upa.simulation.domain.Settings;
 import cz.upa.simulation.messaging.PostOffice;
 import cz.upa.simulation.messaging.SimulationTimer;
+import cz.upa.simulation.messaging.Societies;
 import cz.upa.simulation.output.MysqlConnector;
 
 import java.io.*;
@@ -27,14 +27,20 @@ public class GraphMain {
     }
 
     private static void startSimulation() {
-        PostOffice po = new PostOffice();
+        Societies societies = new Societies();
+        PostOffice po = societies.found();
+        societies.found();
+        societies.found();
+
         SplittableRandom r = new SplittableRandom(seed);
         for (int i = 0; i < Settings.SIZE_ENTITY_SET; i++) {
             double talent = r.nextDouble(Settings.RANGE_TALENT_FROM, Settings.RANGE_TALENT_TO);
             Settings.ACTUAL_POPULATION_TALENT += talent;
-            new Entita(new Matrika(), po, 0.0, talent, "", "");
+
+            new Entita(societies, po, 0.0, talent, "", "");
             RecorderSizePerTime.recordMessages.add(new Double[]{1.0, 0.0});
         }
+//        new Thread(new SocietyGarbageCollector(societies)).start();
     }
 
     private static void recordBuild() throws SQLException {

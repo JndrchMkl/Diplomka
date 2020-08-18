@@ -1,13 +1,28 @@
 package cz.upa.simulation.messaging;
 
+import cz.upa.simulation.domain.Settings;
+
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class PostOffice {
-    ConcurrentHashMap<String, ConcurrentLinkedQueue<String[]>> postOffice = new ConcurrentHashMap<>();
+import static cz.upa.simulation.utils.StringUtils.s;
+
+public class PostOffice implements Runnable {
+    private ConcurrentHashMap<String, ConcurrentLinkedQueue<String[]>> postOffice;
+    private Double score;
+    private double timestampPresent;
+    private double timeStopWatch;
+    private double avgTalent;
+
+    public PostOffice() {
+        postOffice = new ConcurrentHashMap<>();
+        avgTalent = Settings.RANGE_TALENT_FROM + Settings.RANGE_TALENT_TO / 2;
+        score = 0.0;
+        new Thread(this).start();
+    }
 
     public void notifyTo(String owner, String... message) {
         Queue<String[]> inbox = inbox(owner);
@@ -23,12 +38,13 @@ public class PostOffice {
 
         for (String owner : postOffice.keySet()) {
             if (i == index) {
-                if (inbox(owner) == null) {
+                Queue<String[]> inbox = inbox(owner);
+                if (inbox == null) {
                     notifyRandom(message);
-                }else {
-                    inbox(owner).add(message);
+                } else {
+                    inbox.add(message);
+                    return;
                 }
-                return;
             }
             i++;
         }
@@ -39,6 +55,16 @@ public class PostOffice {
             if (!owner.equals(sender))
                 notifyTo(owner, message);
         }
+    }
+
+    public void notifyEveryone(String... message) {
+        for (String owner : postOffice.keySet()) {
+            notifyTo(owner, message);
+        }
+    }
+
+    public void createMailbox(String owner, Queue<String[]> inbox) {
+        postOffice.put(owner, new ConcurrentLinkedQueue<>(inbox));
     }
 
     public void createMailbox(String owner) {
@@ -59,4 +85,34 @@ public class PostOffice {
         postOffice.remove(owner);
     }
 
+
+    public synchronized void donate(double donation) {
+        score += donation;
+    }
+
+    public Double getScore() {
+        return score;
+    }
+
+    public ConcurrentHashMap<String, ConcurrentLinkedQueue<String[]>> getPostOffice() {
+        return postOffice;
+    }
+
+    @Override
+    public void run() {
+        while (Settings.IS_SIMULATION_RUNNING) {
+            double now = System.nanoTime();
+            double interval = now - timestampPresent; // nutno pocitat s intervalem rovnym 0. POZOR!!! Nedělit s intervalem rovným 0!!!
+            timestampPresent = now;
+            timeStopWatch += interval;
+
+
+            score += postOffice.size() * avgTalent * timestampPresent;
+
+            if (timeStopWatch > 500000000.0) {
+                notifyEveryone(MessageType.GIVE_SOURCE.value, s(score));
+            }
+        }
+    }
 }
+

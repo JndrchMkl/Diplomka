@@ -26,7 +26,7 @@ public abstract class Settings {
     public static int SIZE_ENTITY_SET = 10;
     public static boolean IS_SIMULATION_RUNNING = true;
     public static int ACTUAL_ID_BUILD = 1;
-    public static int SIMULATION_DELAY_LENGTH = 20000;
+    public static int SIMULATION_DELAY_LENGTH = 60000;
 
     public static double ACTUAL_POPULATION_TALENT = 0; // SUM(Ta)
     public static double C_SOURCES_POOL = 4000; // C - priblizny pocet vlaken

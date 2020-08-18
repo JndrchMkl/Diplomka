@@ -26,7 +26,7 @@ public class RecorderSizePerTime implements Runnable {
 
     // nahravaci kolekce, sem entity budou vkládat své zpravy o zmeně
     public static ConcurrentLinkedQueue<Double[]> recordMessages;
-    private Queue<Double[]> que = new LinkedList<>();
+    private Queue<Double[]> que;
 
 
     private List<Integer> popSizes;

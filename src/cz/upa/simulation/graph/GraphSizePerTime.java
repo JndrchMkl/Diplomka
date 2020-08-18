@@ -26,8 +26,10 @@ public class GraphSizePerTime implements Runnable {
     @Override
     public void run() {
         TreeMap<Double, Double> map = new TreeMap<>(); // sorted pair of values
-        List<Double> nEntities = new LinkedList<>();
-        List<Double> timeSeries = new LinkedList<>();
+//        List<Double> nEntities = new LinkedList<>();
+//        List<Double> timeSeries = new LinkedList<>();
+       List<Double> born = new LinkedList<>();
+       List<Double> death = new LinkedList<>();
         try {
             BufferedReader reader = FileReading.readActualBuildOutput();
             if (reader != null) {
@@ -40,24 +42,41 @@ public class GraphSizePerTime implements Runnable {
                         double n = Double.parseDouble(data[0]);
                         double time = Double.parseDouble(data[1]) / 1000000000.0;
                         map.put(time < 0 ? 0 : time, n);
-                        nEntities.add(n);
-                        timeSeries.add(time < 0 ? 0 : time);
+//                        nEntities.add(n);
+//                        timeSeries.add(time < 0 ? 0 : time);
                     }
                 }
             }
+Double nDeath=0.0;
+Double nBorn=0.0;
+Double prev=0.0;
+            for (Double n:map.values()) {
+                if (n < prev) {
+                    nDeath++;
+                    nBorn--;
+                }
+                if (n > prev) {
+                    nBorn++;
+                    nDeath--;
+                }
+                born.add(nBorn);
+                death.add(nDeath);
+
+                prev = n;
+            }
 
             // Create Chart
-            final XYChart chart = QuickChart.getChart(CHART_TITLE, X_TITLE, Y_TITLE, SERIES_NAME, timeSeries, nEntities);
-            final XYChart chart1 = QuickChart.getChart(CHART_TITLE, X_TITLE, Y_TITLE, SERIES_NAME,
-                    new ArrayList<Double>(map.keySet()), new ArrayList<Double>(map.values()));
+            final XYChart chart = QuickChart.getChart(CHART_TITLE, X_TITLE, Y_TITLE, SERIES_NAME,new ArrayList<>(map.keySet()), new ArrayList<>(map.values()));
+
+            // Add minor series
+//            chart.addSeries("death", new ArrayList<>(map.keySet()), death);
+//            chart.addSeries("born", new ArrayList<>(map.keySet()), born);
+
             // Customize Chart
-            customise(chart1);
+            customise(chart);
 
             // Show it
-            final SwingWrapper<XYChart> sw = new SwingWrapper<>(chart);
-            final SwingWrapper<XYChart> sw1 = new SwingWrapper<>(chart1);
-            sw.displayChart().setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-            sw1.displayChart().setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+            new SwingWrapper<>(chart).displayChart().setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 
         } catch (IOException e) {
             e.printStackTrace();
