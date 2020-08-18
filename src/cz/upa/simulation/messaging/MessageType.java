@@ -9,10 +9,12 @@ public enum MessageType {
     WANT_STEAL("5"),
     WANT_KILL("6"),
 
-    WE_HAVE_A_BABY("7"),
-    I_DIED("8");
+    WANT_PUNISHMENT("7"),
+    WANT_SECONDARY_PUNISHMENT("8"),
+    EXECUTE_BLOOD_RELATED("9"),
 
-
+    WE_HAVE_A_BABY("73"),
+    I_DIED("83");
     public final String value;
 
     MessageType(String value) {

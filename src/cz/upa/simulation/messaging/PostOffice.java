@@ -18,11 +18,16 @@ public class PostOffice {
 
     public void notifyRandom(String... message) {
         int i = 0;
+
         int index = ThreadLocalRandom.current().nextInt(0, postOffice.keySet().size());
 
         for (String owner : postOffice.keySet()) {
             if (i == index) {
-                inbox(owner).add(message);
+                if (inbox(owner) == null) {
+                    notifyRandom(message);
+                }else {
+                    inbox(owner).add(message);
+                }
                 return;
             }
             i++;

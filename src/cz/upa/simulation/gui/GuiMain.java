@@ -1,23 +1,28 @@
 package cz.upa.simulation.gui;
 
+import cz.upa.simulation.domain.Settings;
+import cz.upa.simulation.graph.GraphMain;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
-import cz.upa.simulation.domain.Settings;
-import cz.upa.simulation.graph.GraphMain;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static cz.upa.simulation.domain.Settings.IS_SIMULATION_RUNNING;
 
 public class GuiMain extends Application {
     /// ENTITY Spinners
@@ -51,6 +56,9 @@ public class GuiMain extends Application {
     /// Simulation Spinners
     @FXML
     private Spinner<Integer> spinnerSizeEntitySet;
+
+    @FXML
+    private Spinner<Integer> spinnerSimulationLength;
 
     @FXML
     private ListView<ListItemIntent> listViewIntents;
@@ -89,12 +97,14 @@ public class GuiMain extends Application {
         initSpinner(spinnerMultiplierIncome, Settings.MULTIPLIER_INCOME, 1, 1);
         initSpinner(spinnerChildExpense, Settings.VALUE_CHILD_EXPENSE, 1, 1);
         initSpinner(spinnerSizeEntitySet, Settings.SIZE_ENTITY_SET, 1, 1);
+        initSpinner(spinnerSimulationLength, Settings.SIMULATION_DELAY_LENGTH, 500, 500);
 
         initCheckList();
 
         buttonSizePerTime.setOnAction(event-> {
             try {
                 setActualConfiguration();
+                infoDialog();
                 GraphMain.main(null);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -102,6 +112,21 @@ public class GuiMain extends Application {
 
         });
     }
+
+    private void infoDialog() {
+        Image image = new Image("https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Emojione_1F62D.svg/64px-Emojione_1F62D.svg.png");
+        ImageView imageView = new ImageView(image);
+
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Simulation is running!");
+        alert.setHeaderText(null);
+        alert.setContentText("I'm working...");
+        alert.setGraphic(imageView);
+        alert.show();
+    }
+
+
 
     private void initCheckList() {
         listViewIntents.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -149,6 +174,9 @@ public class GuiMain extends Application {
         listViewIntents.getItems().add(new ListItemIntent("intentDecideWhoIsPartnerRightNow", true));
         listViewIntents.getItems().add(new ListItemIntent("intentSteal"));
         listViewIntents.getItems().add(new ListItemIntent("intentMurder"));
+        listViewIntents.getItems().add(new ListItemIntent("intentPunishment"));
+        listViewIntents.getItems().add(new ListItemIntent("intentSecondaryPunishment"));
+        listViewIntents.getItems().add(new ListItemIntent("intentGrowSociety"));
     }
 
     private void initSpinner(Spinner<Double> spinner, double value, int incrementStep, int decrementStep) {
@@ -174,10 +202,10 @@ public class GuiMain extends Application {
                 case UP:
                     spinner.increment(incrementStep);
                     actualValue.set(spinner.getValue());
-                    System.out.println("---" + actualValue.toString());
                     break;
                 case DOWN:
                     spinner.decrement(decrementStep);
+                    actualValue.set(spinner.getValue());
                     break;
             }
         });
@@ -200,10 +228,16 @@ public class GuiMain extends Application {
         Settings.MULTIPLIER_INCOME = spinnerMultiplierIncome.getValue();
         Settings.VALUE_CHILD_EXPENSE = spinnerChildExpense.getValue();
         Settings.SIZE_ENTITY_SET = spinnerSizeEntitySet.getValue();
+        Settings.SIMULATION_DELAY_LENGTH = spinnerSimulationLength.getValue();
+        Settings.ACTUAL_POPULATION_TALENT=0;
+        Settings.IS_SIMULATION_RUNNING = true;
 
        Settings.INTENT_LOOK_FOR_PARTNER= listViewIntents.getItems().get(0).isSelected();
        Settings.INTENT_DECIDE_RIGHT_NOW= listViewIntents.getItems().get(1).isSelected();
        Settings.INTENT_STEAL= listViewIntents.getItems().get(2).isSelected();
        Settings.INTENT_MURDER= listViewIntents.getItems().get(3).isSelected();
+       Settings.INTENT_PUNISHMENT= listViewIntents.getItems().get(4).isSelected();
+       Settings.INTENT_SECONDARY_PUNISHMENT= listViewIntents.getItems().get(5).isSelected();
+       Settings.INTENT_GROW_SOCIETY= listViewIntents.getItems().get(6).isSelected();
     }
 }

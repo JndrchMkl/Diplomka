@@ -5,6 +5,10 @@ public final class StringUtils {
         return number + "";
     }
 
+    public static String s(boolean condition) {
+        return condition + "";
+    }
+
     public static String s(Integer number) {
         return number + "";
     }

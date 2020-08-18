@@ -15,7 +15,7 @@ public class Main {
         for (int i = 0; i < size; i++) {
 //            Double sources = ThreadLocalRandom.current().nextDouble(0.0, SystemCore.CHILD_EXPENSE); // starting sources
             Double talent = ThreadLocalRandom.current().nextDouble(5.0, 10.0 + 1);
-            entityList.add(new Entita(matrika, postOffice, 0.0, talent));
+            entityList.add(new Entita(matrika, postOffice, 0.0, talent,"",""));
         }
         return entityList;
     }

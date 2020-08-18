@@ -1,16 +1,19 @@
 package cz.upa.simulation.graph;
 
-import cz.upa.simulation.domain.Entita;
-import cz.upa.simulation.domain.Matrika;
-import cz.upa.simulation.messaging.PostOffice;
-import cz.upa.simulation.domain.Settings;
+import cz.upa.simulation.output.FileReading;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChart;
+import org.knowm.xchart.XYSeries;
+import org.knowm.xchart.style.Styler;
 
+import javax.swing.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.TreeMap;
 
 public class GraphSizePerTime implements Runnable {
 
@@ -19,62 +22,56 @@ public class GraphSizePerTime implements Runnable {
     public static final String Y_TITLE = "nEntities";
     public static final String SERIES_NAME = "population";
 
-    private Matrika matrika = new Matrika();
-    private PostOffice postOffice = new PostOffice();
-    private boolean isRunning = true;
 
     @Override
     public void run() {
-        double timeBegin = System.nanoTime();
-        double timeStopWatch = 0;
-        double timeoutStopWatch = 0;
-        double[][] initdata = new double[2][1];
-        List<Double> times = new LinkedList<>();
-        List<Integer> nEntities = new LinkedList<>();
-        int nRecords = 0;
-
-
-        initdata[0] = new double[]{0};
-        initdata[1] = new double[]{2};
-
-        // Create Chart
-        final XYChart chart = QuickChart.getChart(CHART_TITLE, X_TITLE, Y_TITLE, SERIES_NAME, initdata[0], initdata[1]);
-
-        // Show it
-        final SwingWrapper<XYChart> sw = new SwingWrapper<>(chart);
-        sw.displayChart();
-
+        TreeMap<Double, Double> map = new TreeMap<>(); // sorted pair of values
+        List<Double> nEntities = new LinkedList<>();
+        List<Double> timeSeries = new LinkedList<>();
         try {
-            startSimulation();
-
-            while (isRunning) {
-                double now = System.nanoTime();
-                double interval = now - timeBegin; // nutno pocitat s intervalem rovnym 0. POZOR!!! Nedělit s intervalem rovným 0!!!
-                timeStopWatch += interval;
-                timeoutStopWatch += interval;
-                timeBegin = now;
-
-
-                times.add(timeStopWatch / 1000000000);
-                nEntities.add(matrika.nRecords());
-//                if (timeoutStopWatch > 1000000000) {
-
-//                System.out.println("tick"+timeoutStopWatch);
-                    chart.updateXYSeries(SERIES_NAME, times, nEntities, null);
-                    sw.repaintChart();
-                    timeoutStopWatch = 0;
-//                }
-                Thread.sleep(100);
+            BufferedReader reader = FileReading.readActualBuildOutput();
+            if (reader != null) {
+                String line = "";
+                String[] data;
+                while (line != null) {
+                    line = reader.readLine();
+                    if (line != null) {
+                        data = line.split(";");
+                        double n = Double.parseDouble(data[0]);
+                        double time = Double.parseDouble(data[1]) / 1000000000.0;
+                        map.put(time < 0 ? 0 : time, n);
+                        nEntities.add(n);
+                        timeSeries.add(time < 0 ? 0 : time);
+                    }
+                }
             }
-        } catch (InterruptedException e) {
+
+            // Create Chart
+            final XYChart chart = QuickChart.getChart(CHART_TITLE, X_TITLE, Y_TITLE, SERIES_NAME, timeSeries, nEntities);
+            final XYChart chart1 = QuickChart.getChart(CHART_TITLE, X_TITLE, Y_TITLE, SERIES_NAME,
+                    new ArrayList<Double>(map.keySet()), new ArrayList<Double>(map.values()));
+            // Customize Chart
+            customise(chart1);
+
+            // Show it
+            final SwingWrapper<XYChart> sw = new SwingWrapper<>(chart);
+            final SwingWrapper<XYChart> sw1 = new SwingWrapper<>(chart1);
+            sw.displayChart().setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+            sw1.displayChart().setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    void startSimulation() {
-        for (int i = 0; i < Settings.SIZE_ENTITY_SET; i++) {
-            Double talent = ThreadLocalRandom.current().nextDouble(Settings.RANGE_TALENT_FROM, Settings.RANGE_TALENT_TO );
-            new Entita(matrika, postOffice, 0.0, talent);
-        }
+    private void customise(XYChart chart) {
+        chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNW);
+        chart.getStyler().setDefaultSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Line);
+        chart.getStyler().setMarkerSize(0);
+        chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideSE);
+        chart.getStyler().setPlotMargin(0);
+        chart.getStyler().setPlotContentSize(.95);
     }
+
+
 }
