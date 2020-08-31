@@ -37,8 +37,8 @@ public class GraphMain {
             double talent = r.nextDouble(Settings.RANGE_TALENT_FROM, Settings.RANGE_TALENT_TO);
             Settings.ACTUAL_POPULATION_TALENT += talent;
 
-            new Entita(societies, po, 0.0, talent, "", "");
-            RecorderSizePerTime.recordMessages.add(new Double[]{1.0, 0.0});
+            Entita entita = new Entita(societies, po, 0.0, talent, "", "");
+            RecorderSizePerTime.recordMessages.add(new Double[]{1.0, 0.0, talent, 0.0, 0.0, 0.0});
         }
 //        new Thread(new SocietyGarbageCollector(societies)).start();
     }

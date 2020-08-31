@@ -1,7 +1,6 @@
 package cz.upa.simulation;
 
 import cz.upa.simulation.domain.Entita;
-import cz.upa.simulation.domain.Matrika;
 import cz.upa.simulation.messaging.PostOffice;
 import cz.upa.simulation.messaging.Societies;
 

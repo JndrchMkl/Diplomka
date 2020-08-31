@@ -1,5 +1,6 @@
 package cz.upa.simulation.graph;
 
+import cz.upa.simulation.domain.Settings;
 import cz.upa.simulation.output.FileReading;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.SwingWrapper;
@@ -25,11 +26,9 @@ public class GraphSizePerTime implements Runnable {
 
     @Override
     public void run() {
-        TreeMap<Double, Double> map = new TreeMap<>(); // sorted pair of values
-//        List<Double> nEntities = new LinkedList<>();
-//        List<Double> timeSeries = new LinkedList<>();
-       List<Double> born = new LinkedList<>();
-       List<Double> death = new LinkedList<>();
+        TreeMap<Double, String> map = new TreeMap<>(); // sorted pair of values
+        List<Double> popSize = new LinkedList<>();
+        double nEntities = Settings.SIZE_ENTITY_SET - 1;
         try {
             BufferedReader reader = FileReading.readActualBuildOutput();
             if (reader != null) {
@@ -39,38 +38,26 @@ public class GraphSizePerTime implements Runnable {
                     line = reader.readLine();
                     if (line != null) {
                         data = line.split(";");
-                        double n = Double.parseDouble(data[0]);
+//                        double n = Double.parseDouble(data[0]);
+                        String operator = data[0];
                         double time = Double.parseDouble(data[1]) / 1000000000.0;
-                        map.put(time < 0 ? 0 : time, n);
-//                        nEntities.add(n);
-//                        timeSeries.add(time < 0 ? 0 : time);
+                        map.put(time < 0 ? 0 : time, operator);
+
                     }
                 }
             }
-Double nDeath=0.0;
-Double nBorn=0.0;
-Double prev=0.0;
-            for (Double n:map.values()) {
-                if (n < prev) {
-                    nDeath++;
-                    nBorn--;
-                }
-                if (n > prev) {
-                    nBorn++;
-                    nDeath--;
-                }
-                born.add(nBorn);
-                death.add(nDeath);
-
-                prev = n;
+            for (String operator : map.values()) {
+                if (operator.equals("++"))
+                    popSize.add(++nEntities);
+                else if (operator.equals("--"))
+                    popSize.add(--nEntities);
             }
-
             // Create Chart
-            final XYChart chart = QuickChart.getChart(CHART_TITLE, X_TITLE, Y_TITLE, SERIES_NAME,new ArrayList<>(map.keySet()), new ArrayList<>(map.values()));
+            final XYChart chart = QuickChart.getChart(CHART_TITLE, X_TITLE, Y_TITLE, SERIES_NAME, new ArrayList<>(map.keySet()), popSize);
 
             // Add minor series
 //            chart.addSeries("death", new ArrayList<>(map.keySet()), death);
-//            chart.addSeries("born", new ArrayList<>(map.keySet()), born);
+//            chart.addSeries("popSize", new ArrayList<>(map.keySet()), popSize);
 
             // Customize Chart
             customise(chart);

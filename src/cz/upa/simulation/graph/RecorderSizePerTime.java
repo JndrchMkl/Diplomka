@@ -43,7 +43,7 @@ public class RecorderSizePerTime implements Runnable {
         actualSimulationTime = simulationTimeStart;
         PATH = "";
         id = s(ACTUAL_ID_BUILD);
-        fileName = PATH.concat(id).concat(".txt");
+        fileName = PATH.concat(id).concat(".csv");
         directoryName = PATH.concat("output");
         timeout = 0;
         actualSize = 0;
@@ -77,15 +77,18 @@ public class RecorderSizePerTime implements Runnable {
                 // zpracovani zprav, tj. zarazeni zpravy do kolekce,....
                 while (!que.isEmpty()) {
                     Double[] data = que.poll();
+                    double timeSign = data[1] - simulationTimeStart;
                     if (data[0] == 0.0) { // 0 = "dead"
-                        double timeSign = data[1] - simulationTimeStart;
-                        bw.write(--actualSize + ";" + new BigDecimal(timeSign));
-                        bw.newLine();
+                        bw.write(l("--", s(new BigDecimal(timeSign)),s(BigDecimal.valueOf(data[2])),s(BigDecimal.valueOf(data[3])),s(data[4]),s(data[5])));
                     }
                     if (data[0] == 1.0) { // 1 = "new_born"
-                        double timeSign = data[1] - simulationTimeStart;
-                        bw.write(++actualSize + ";" + new BigDecimal(timeSign));
-                        bw.newLine();
+                        bw.write(l("++" ,s(new BigDecimal(timeSign)),s(BigDecimal.valueOf(data[2])),s(BigDecimal.valueOf(data[3])),s(data[4]),s(data[5])));
+                    }
+                    if (data[0] == 2.0) { // 2 = "steal"
+                        bw.write(l("steal" ,s(new BigDecimal(timeSign)),s(new BigDecimal(data[2])),s(BigDecimal.valueOf(data[3])),s(data[4]),s(data[5])));
+                    }
+                    if (data[0] == 3.0) { // 3 = "murder"
+                        bw.write(l("murder", s(new BigDecimal(timeSign)), s(new BigDecimal(data[2])), s(BigDecimal.valueOf(data[3])), s(data[4]), s(data[5])));
                     }
                 }
                 bw.flush();
@@ -101,6 +104,14 @@ public class RecorderSizePerTime implements Runnable {
         }
     }
 
+    private String l(String... lineList) {
+        StringBuilder line= new StringBuilder();
+        for (String item : lineList) {
+            line.append(item).append(";");
+        }
+        line.append("\n");
+        return line.toString();
+    }
     private void withdrawMessages() {
         que = new LinkedList<>(recordMessages);
         recordMessages.clear();

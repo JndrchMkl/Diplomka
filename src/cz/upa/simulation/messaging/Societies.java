@@ -3,8 +3,9 @@ package cz.upa.simulation.messaging;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SplittableRandom;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Societies  {
+public class Societies {
     List<PostOffice> postOffices;
 
     public Societies() {
@@ -32,5 +33,12 @@ public class Societies  {
         return postOffices;
     }
 
-
+    public void sendInterSocietyMessage(String addressee, String... message) {
+        for (PostOffice po : postOffices) {
+            ConcurrentLinkedQueue<String[]> mailbox = po.getPostOffice().get(addressee);
+            if (mailbox != null) {
+                mailbox.add(message);
+            }
+        }
+    }
 }

@@ -14,7 +14,7 @@ public class FileReading {
     public static BufferedReader readActualBuildOutput() {
         String PATH = "";
         String id = s((Settings.ACTUAL_ID_BUILD));
-        String fileName = PATH.concat(id).concat(".txt");
+        String fileName = PATH.concat(id).concat(".csv");
         String directoryName = PATH.concat("output");
         File file = new File(directoryName + "/" + fileName);
         try {

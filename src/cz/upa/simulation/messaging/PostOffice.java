@@ -19,7 +19,7 @@ public class PostOffice implements Runnable {
 
     public PostOffice() {
         postOffice = new ConcurrentHashMap<>();
-        avgTalent = Settings.RANGE_TALENT_FROM + Settings.RANGE_TALENT_TO / 2;
+        avgTalent = (Settings.RANGE_TALENT_FROM + Settings.RANGE_TALENT_TO) / 2;
         score = 0.0;
         new Thread(this).start();
     }
@@ -107,10 +107,11 @@ public class PostOffice implements Runnable {
             timeStopWatch += interval;
 
 
-            score += postOffice.size() * avgTalent * timestampPresent;
+            score += postOffice.size() * avgTalent * interval;
 
             if (timeStopWatch > 500000000.0) {
                 notifyEveryone(MessageType.GIVE_SOURCE.value, s(score));
+                score=0.0;
             }
         }
     }

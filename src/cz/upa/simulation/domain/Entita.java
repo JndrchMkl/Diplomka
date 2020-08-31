@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.SplittableRandom;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static cz.upa.simulation.domain.Settings.ACTUAL_POPULATION_TALENT;
@@ -21,10 +20,13 @@ import static cz.upa.simulation.utils.TimeUtils.systemNanoTime;
 
 public class Entita implements Runnable {
 
+    private double isThief;
+    private double isMurderer;
     // Character attributes
     private double patience;
     private double strength;
     private double perception;
+    private double propensityCrime;
 
     private double sources;
     private double talent;
@@ -42,7 +44,6 @@ public class Entita implements Runnable {
     private Queue<String[]> messages;
     private Queue<String[]> potentialPartners;
     private List<Double> intervalList;
-    private boolean hasRecord = false;
     private boolean isAlive;
     private boolean isLookingForPartner;
     private boolean intentLookForYourNewPartner;
@@ -55,9 +56,8 @@ public class Entita implements Runnable {
     private boolean intentGrowSocietyFound;
     private boolean intentGrowSocietyJoin;
     private boolean hasPunished;
-    private Thread thread;
+    private final Thread thread;
     private int nTicks = 0;
-    int i = 0;
     private double timeStopWatch = 0;
 
 
@@ -80,9 +80,12 @@ public class Entita implements Runnable {
         this.intentGrowSocietyFound = false;
         this.intentGrowSocietyJoin = false;
         this.hasPunished = false;
+        this.isThief = 0.0;
+        this.isMurderer = 0.0;
         patience = ThreadLocalRandom.current().nextDouble(Settings.RANGE_PATIENCE_FROM, Settings.RANGE_PATIENCE_TO);
         strength = ThreadLocalRandom.current().nextDouble(Settings.RANGE_STRENGTH_FROM, Settings.RANGE_STRENGTH_TO);
         perception = ThreadLocalRandom.current().nextDouble(Settings.RANGE_PERCEPTION_FROM, Settings.RANGE_PERCEPTION_TO);
+        propensityCrime = ThreadLocalRandom.current().nextDouble(Settings.RANGE_PERCEPTION_FROM, Settings.RANGE_PERCEPTION_TO);
         children = new LinkedList<>();
         messages = new LinkedList<>();
         potentialPartners = new LinkedList<>();
@@ -122,21 +125,18 @@ public class Entita implements Runnable {
             intervalList.add((interval));
             nTicks++;
 
+            // income
+            salary(interval);
+            liveCosts(interval);
 
             // zemri starim (nebo hladověním)
             if (timestampPresent > timestampEnd || sources < 0 || !IS_SIMULATION_RUNNING) {
                 ACTUAL_POPULATION_TALENT -= talent;
-//                die();
                 postOffice.removeMailbox(name());
-                RecorderSizePerTime.recordMessages.add(new Double[]{0.0, timestampPresent});
-//                System.out.println("SMRT!!! " + name());
+                RecorderSizePerTime.recordMessages.add(new Double[]{0.0, timestampPresent, talent, propensityCrime, isThief, isMurderer});
                 return;
             }
-
-            // income
             messages.addAll(postOffice.withdrawMessages(name()));
-            salary(interval);
-            liveCosts(interval);
 
 
             // Intents
@@ -152,10 +152,6 @@ public class Entita implements Runnable {
             }
             // 02 - Process the intent
             if (intentDecideWhoIsPartnerRightNow) {
-                //pokud vyprsel cas (timeout) pro hledani partnera, dojdu k rozhodnuti a oznamim mu ze mam s nim dite
-                // candidate of having baby
-                // option 1 - accept first
-                // option 2 - accept best by some criterium talent, age, strength, patience
                 String mostTalented = "0.0";
                 String[] best = null;
 
@@ -172,7 +168,7 @@ public class Entita implements Runnable {
                     Entita child = new Entita(societies, postOffice, 0, talent, name(), best[2]);
                     postOffice.createMailbox(child.name());
                     postOffice.notifyTo(best[2], YOU_ARE_DAD.value, s(this.talent), s(sources), name(), child.name());
-                    RecorderSizePerTime.recordMessages.add(new Double[]{1.0, timestampPresent});
+                    RecorderSizePerTime.recordMessages.add(new Double[]{1.0, timestampPresent, talent, propensityCrime, isThief, isMurderer});
 
                     children.add(child.name());
                     timeStopWatch = 0;
@@ -183,10 +179,14 @@ public class Entita implements Runnable {
             // 03 - Process the intent
             if (intentSteal) {
                 postOffice.notifyRandom(WANT_STEAL.value, name(), s(perception), s(hasPunished));
+                isThief = 1.0;
+                RecorderSizePerTime.recordMessages.add(new Double[]{2.0, timestampPresent, talent, propensityCrime, isThief, isMurderer});
             }
             // 04 - Process the intent
             if (intentMurder) {
                 postOffice.notifyRandom(WANT_KILL.value, name(), s(strength), s(hasPunished));
+                isMurderer = 1.0;
+                RecorderSizePerTime.recordMessages.add(new Double[]{3.0, timestampPresent, talent, propensityCrime, isThief, isMurderer});
             }
             if (intentGrowSociety) {
                 double donation = sources / 5;
@@ -206,7 +206,6 @@ public class Entita implements Runnable {
             if (intentGrowSocietyFound) {
                 postOffice = societies.found();
                 postOffice.createMailbox(name());
-                i++;
             }
 
 
@@ -218,8 +217,10 @@ public class Entita implements Runnable {
             intentPunishment = Settings.INTENT_PUNISHMENT;
             intentSecondaryPunishment = Settings.INTENT_SECONDARY_PUNISHMENT;
             intentGrowSociety = children.size() > 10 && Settings.INTENT_GROW_SOCIETY;
-            intentGrowSocietyJoin = ThreadLocalRandom.current().nextInt(0, 100) < 25;
-            intentGrowSocietyFound = ThreadLocalRandom.current().nextInt(0, 1000000000) < 2;
+            intentGrowSocietyJoin = ThreadLocalRandom.current().nextInt(0, 100) < 25 && Settings.INTENT_GROW_SOCIETY;
+            //intentGrowSocietyJoin = timeStopWatch > moraleMurder/2 && Settings.INTENT_GROW_SOCIETY;;
+            intentGrowSocietyFound = ThreadLocalRandom.current().nextInt(0, 1000000000) < 2 && Settings.INTENT_GROW_SOCIETY;
+
 
             /// Phase 2 - process messages
             while (!messages.isEmpty()) {
@@ -267,10 +268,11 @@ public class Entita implements Runnable {
                     int chance = new SplittableRandom().nextInt(0, 100);
                     if (chance < 50) {
                         // Send him your money // vs throw away money // vs donate society
-                        sources = sources/4;
+                        sources = sources / 4;
                     } else if (chance < 95) {
                         // execute you
                         die();
+                        break;
                     } else {
                         postOffice.notifyTo(parrentA, EXECUTE_BLOOD_RELATED.value, name());
                         postOffice.notifyTo(parrentB, EXECUTE_BLOOD_RELATED.value, name());
@@ -278,6 +280,7 @@ public class Entita implements Runnable {
                             postOffice.notifyTo(c, EXECUTE_BLOOD_RELATED.value, name());
                         }
                         die();
+                        break;
                     }
                 }
                 if (message[0].equals(WANT_SECONDARY_PUNISHMENT.value)) {
@@ -288,14 +291,14 @@ public class Entita implements Runnable {
                         postOffice.notifyTo(c, EXECUTE_BLOOD_RELATED.value, name());
                     }
                     die();
+                    break;
                 }
                 if (message[0].equals(EXECUTE_BLOOD_RELATED.value)) {
                     die();
+                    break;
                 }
             }
         }
-//        RecorderSizePerTime.recordMessages.add(new Double[]{0.0, timestampPresent});
-        System.out.println("Its not fair! I has been ended :/ " + name());
     }
 
     private double timeNow() {
@@ -323,14 +326,13 @@ public class Entita implements Runnable {
     }
 
     private void die() {
-//        postOffice.removeMailbox(name());
-//        isAlive = false;
         timestampPresent = timestampEnd + 1;
     }
 
     Thread thread() {
         return thread;
     }
+
 
     @Override
     public String toString() {
